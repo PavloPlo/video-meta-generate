@@ -1,12 +1,6 @@
 import Link from "next/link";
 
-const navLinks = [
-  { label: "Product", href: "#solution" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Examples", href: "#examples" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" }
-];
+import HeaderSticky from "@/components/landing/HeaderSticky";
 
 const proofStats = [
   { label: "Creator teams onboarded", value: "220+" },
@@ -136,35 +130,7 @@ const faqItems = [
 export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-      <header className="sticky top-4 z-10 rounded-2xl border border-slate-800 bg-slate-950/80 p-4 backdrop-blur">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
-              Video Meta Generate
-            </p>
-            <p className="text-xs text-slate-500">
-              Metadata intelligence for modern video teams.
-            </p>
-          </div>
-          <nav className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                className="transition hover:text-white"
-                href={link.href}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <Link
-            className="rounded-full border border-slate-700 px-4 py-2 text-sm font-semibold text-white transition hover:border-slate-500"
-            href="#final-cta"
-          >
-            Book a demo
-          </Link>
-        </div>
-      </header>
+      <HeaderSticky />
 
       <section id="hero" className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="flex flex-col gap-6">
