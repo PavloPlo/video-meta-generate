@@ -13,8 +13,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#f6f7fb] text-slate-950 antialiased">
-        <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#eef2ff_0%,_#f6f7fb_45%,_#f8fafc_100%)] px-6 py-10">
+      <body className="bg-[var(--color-background)] text-[var(--color-foreground)] antialiased">
+        <div className="min-h-screen bg-[radial-gradient(circle_at_top,_var(--color-hero-start)_0%,_var(--color-hero-mid)_45%,_var(--color-hero-end)_100%)] px-6 py-10">
           {children}
         </div>
       </body>
