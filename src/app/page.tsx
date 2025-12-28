@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import AnalyticsListener from "@/components/landing/AnalyticsListener";
 import HeaderSticky from "@/components/landing/HeaderSticky";
 
 const proofStats = [
@@ -129,7 +130,8 @@ const faqItems = [
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+      <AnalyticsListener />
       <HeaderSticky />
 
       <section id="hero" className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
@@ -149,12 +151,14 @@ export default function Home() {
             <Link
               className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_15px_35px_-20px_rgba(79,70,229,0.8)] transition hover:from-indigo-500 hover:to-sky-400"
               href="#pricing"
+              data-cta="hero_pricing"
             >
               See pricing
             </Link>
             <Link
               className="rounded-full border border-slate-200 bg-white/70 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
               href="#examples"
+              data-cta="hero_examples"
             >
               View examples
             </Link>
@@ -336,12 +340,14 @@ export default function Home() {
             <Link
               className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_25px_-15px_rgba(79,70,229,0.7)] transition hover:from-indigo-500 hover:to-sky-400"
               href="#pricing"
+              data-cta="how_it_works_start_pilot"
             >
               Start a pilot
             </Link>
             <Link
               className="rounded-full border border-slate-200 bg-white/70 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
               href="#final-cta"
+              data-cta="how_it_works_talk_sales"
             >
               Talk to sales
             </Link>
@@ -362,7 +368,8 @@ export default function Home() {
           {examples.map((example) => (
             <div
               key={example.title}
-              className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-[0_15px_45px_-35px_rgba(15,23,42,0.4)]"
+              data-example={example.title}
+              className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
             >
               <h3 className="text-lg font-semibold text-slate-900">
                 {example.title}
@@ -449,6 +456,7 @@ export default function Home() {
           <Link
             className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-5 py-2 text-center text-sm font-semibold text-white shadow-[0_10px_25px_-15px_rgba(79,70,229,0.7)] transition hover:from-indigo-500 hover:to-sky-400"
             href="#final-cta"
+            data-cta="pricing_request_details"
           >
             Request pricing details
           </Link>
@@ -468,7 +476,8 @@ export default function Home() {
           {faqItems.map((item) => (
             <details
               key={item.question}
-              className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-[0_15px_45px_-35px_rgba(15,23,42,0.35)]"
+              data-faq={item.question}
+              className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
             >
               <summary className="cursor-pointer text-sm font-semibold text-slate-900">
                 {item.question}
@@ -498,6 +507,7 @@ export default function Home() {
           <Link
             className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-6 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-20px_rgba(79,70,229,0.75)] transition hover:from-indigo-500 hover:to-sky-400"
             href="mailto:hello@videometagenerate.com"
+            data-cta="final_cta_schedule_walkthrough"
           >
             Schedule a walkthrough
           </Link>

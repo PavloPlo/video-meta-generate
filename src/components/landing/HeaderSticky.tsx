@@ -40,6 +40,7 @@ export default function HeaderSticky() {
           <Link
             className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-15px_rgba(79,70,229,0.8)] transition hover:from-indigo-500 hover:to-sky-400"
             href="#final-cta"
+            data-cta="header_book_demo"
           >
             Book a demo
           </Link>
