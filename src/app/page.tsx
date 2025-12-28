@@ -129,52 +129,52 @@ const faqItems = [
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-20 pt-8 sm:px-6 lg:px-8">
       <HeaderSticky />
 
-      <section id="hero" className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <section id="hero" className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="flex flex-col gap-6">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             Intelligent video metadata
           </p>
-          <h1 className="text-4xl font-semibold text-white sm:text-5xl">
+          <h1 className="text-4xl font-semibold text-slate-950 sm:text-5xl">
             Publish video metadata faster, smarter, and in every language.
           </h1>
-          <p className="text-base leading-relaxed text-slate-300">
+          <p className="text-base leading-relaxed text-slate-600">
             Video Meta Generate helps creator teams turn briefs into optimized
             titles, descriptions, chapters, and tags with AI-assisted workflows
             and brand-safe controls.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
-              className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950"
+              className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_15px_35px_-20px_rgba(79,70,229,0.8)] transition hover:from-indigo-500 hover:to-sky-400"
               href="#pricing"
             >
               See pricing
             </Link>
             <Link
-              className="rounded-full border border-slate-700 px-5 py-2 text-sm font-semibold text-white"
+              className="rounded-full border border-slate-200 bg-white/70 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
               href="#examples"
             >
               View examples
             </Link>
           </div>
-          <div className="flex flex-wrap items-center gap-6 text-xs text-slate-400">
+          <div className="flex flex-wrap items-center gap-6 text-xs text-slate-500">
             <span>Trusted by creator studios</span>
             <span>Security-ready workflows</span>
             <span>Fast onboarding</span>
           </div>
         </div>
-        <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-500/10 p-6">
+        <div className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_25px_70px_-45px_rgba(15,23,42,0.55)] backdrop-blur">
           <div className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+            <div className="rounded-2xl border border-slate-200 bg-white/90 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
                 Draft metadata preview
               </p>
-              <h2 className="mt-2 text-lg font-semibold text-white">
+              <h2 className="mt-2 text-lg font-semibold text-slate-900">
                 5 tips to grow your creator economy channel
               </h2>
-              <p className="mt-2 text-sm text-slate-400">
+              <p className="mt-2 text-sm text-slate-500">
                 Generated description, chapters, and tags tailored to YouTube.
               </p>
             </div>
@@ -182,12 +182,12 @@ export default function Home() {
               {proofStats.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4"
+                  className="rounded-2xl border border-slate-200 bg-white/90 p-4"
                 >
-                  <p className="text-2xl font-semibold text-white">
+                  <p className="text-2xl font-semibold text-slate-900">
                     {stat.value}
                   </p>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
                     {stat.label}
                   </p>
                 </div>
@@ -199,12 +199,12 @@ export default function Home() {
 
       <section
         id="proof"
-        className="grid gap-6 rounded-3xl border border-slate-800 bg-slate-900/50 p-8 md:grid-cols-3"
+        className="grid gap-6 rounded-3xl border border-slate-200/80 bg-white/80 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.45)] md:grid-cols-3"
       >
         {proofStats.map((stat) => (
           <div key={stat.label} className="flex flex-col gap-2">
-            <p className="text-3xl font-semibold text-white">{stat.value}</p>
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+            <p className="text-3xl font-semibold text-slate-900">{stat.value}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
               {stat.label}
             </p>
           </div>
@@ -213,22 +213,25 @@ export default function Home() {
 
       <section id="problem" className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="flex flex-col gap-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             The problem
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Metadata is the bottleneck for scaling video performance.
           </h2>
-          <p className="text-sm leading-relaxed text-slate-300">
+          <p className="text-sm leading-relaxed text-slate-600">
             Without a dedicated workflow, teams juggle spreadsheets, version
             chaos, and inconsistent copy. That slows launches and leaves
             discoverability on the table.
           </p>
         </div>
-        <ul className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-300">
+        <ul className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 text-sm text-slate-600 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)]">
           {problemPoints.map((point) => (
-            <li key={point} className="flex gap-3 border-b border-slate-800/60 py-3 last:border-b-0">
-              <span className="mt-1 inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            <li
+              key={point}
+              className="flex gap-3 border-b border-slate-200/80 py-3 last:border-b-0"
+            >
+              <span className="mt-1 inline-flex h-2 w-2 rounded-full bg-indigo-500" />
               <span>{point}</span>
             </li>
           ))}
@@ -237,10 +240,10 @@ export default function Home() {
 
       <section id="solution" className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             The solution
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Two pillars for repeatable metadata excellence.
           </h2>
         </div>
@@ -248,18 +251,18 @@ export default function Home() {
           {solutionPillars.map((pillar) => (
             <article
               key={pillar.title}
-              className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6"
+              className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)]"
             >
-              <h3 className="text-xl font-semibold text-white">
+              <h3 className="text-xl font-semibold text-slate-900">
                 {pillar.title}
               </h3>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-slate-600">
                 {pillar.description}
               </p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-300">
+              <ul className="mt-4 space-y-2 text-sm text-slate-600">
                 {pillar.bullets.map((bullet) => (
                   <li key={bullet} className="flex gap-3">
-                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-indigo-500" />
                     <span>{bullet}</span>
                   </li>
                 ))}
@@ -271,10 +274,10 @@ export default function Home() {
 
       <section id="features" className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             Feature grid
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Everything needed to craft publish-ready metadata.
           </h2>
         </div>
@@ -282,12 +285,12 @@ export default function Home() {
           {featureCards.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
+              className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-[0_15px_45px_-35px_rgba(15,23,42,0.4)]"
             >
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-slate-900">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-slate-600">
                 {feature.description}
               </p>
             </div>
@@ -297,10 +300,10 @@ export default function Home() {
 
       <section id="how-it-works" className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             How it works
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Three steps to metadata that performs.
           </h2>
         </div>
@@ -308,36 +311,36 @@ export default function Home() {
           {steps.map((step, index) => (
             <div
               key={step.title}
-              className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
+              className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-[0_15px_45px_-35px_rgba(15,23,42,0.4)]"
             >
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
                 Step {index + 1}
               </p>
-              <h3 className="mt-2 text-lg font-semibold text-white">
+              <h3 className="mt-2 text-lg font-semibold text-slate-900">
                 {step.title}
               </h3>
-              <p className="mt-2 text-sm text-slate-300">{step.description}</p>
+              <p className="mt-2 text-sm text-slate-600">{step.description}</p>
             </div>
           ))}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)]">
           <div>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-slate-900">
               Ready to streamline metadata?
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Launch a pilot in under 7 days.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950"
+              className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_25px_-15px_rgba(79,70,229,0.7)] transition hover:from-indigo-500 hover:to-sky-400"
               href="#pricing"
             >
               Start a pilot
             </Link>
             <Link
-              className="rounded-full border border-slate-700 px-5 py-2 text-sm font-semibold text-white"
+              className="rounded-full border border-slate-200 bg-white/70 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
               href="#final-cta"
             >
               Talk to sales
@@ -348,10 +351,10 @@ export default function Home() {
 
       <section id="examples" className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             Examples gallery
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Metadata packages built for real creator teams.
           </h2>
         </div>
@@ -359,12 +362,12 @@ export default function Home() {
           {examples.map((example) => (
             <div
               key={example.title}
-              className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
+              className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-[0_15px_45px_-35px_rgba(15,23,42,0.4)]"
             >
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-slate-900">
                 {example.title}
               </h3>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-slate-600">
                 {example.description}
               </p>
             </div>
@@ -374,28 +377,28 @@ export default function Home() {
 
       <section id="trends" className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <div className="flex flex-col gap-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             Trends + multilingual
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Keep pace with trends, in every language you publish.
           </h2>
-          <p className="text-sm leading-relaxed text-slate-300">
+          <p className="text-sm leading-relaxed text-slate-600">
             Surface trending topics, hook formats, and hashtag clusters, then
             localize instantly for global audiences without sacrificing tone.
           </p>
         </div>
-        <ul className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-300">
-          <li className="flex gap-3 border-b border-slate-800/60 py-3">
-            <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
+        <ul className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 text-sm text-slate-600 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)]">
+          <li className="flex gap-3 border-b border-slate-200/80 py-3">
+            <span className="mt-1 h-2 w-2 rounded-full bg-indigo-500" />
             <span>Auto-detected trend alerts for your content category.</span>
           </li>
-          <li className="flex gap-3 border-b border-slate-800/60 py-3">
-            <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
+          <li className="flex gap-3 border-b border-slate-200/80 py-3">
+            <span className="mt-1 h-2 w-2 rounded-full bg-indigo-500" />
             <span>Multilingual rewrites with tone and keyword fidelity.</span>
           </li>
           <li className="flex gap-3 py-3">
-            <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="mt-1 h-2 w-2 rounded-full bg-indigo-500" />
             <span>Regional performance insights to guide optimization.</span>
           </li>
         </ul>
@@ -403,48 +406,48 @@ export default function Home() {
 
       <section
         id="pricing"
-        className="grid gap-6 rounded-3xl border border-slate-800 bg-slate-900/60 p-8 lg:grid-cols-[1.1fr_0.9fr]"
+        className="grid gap-6 rounded-3xl border border-slate-200/80 bg-white/85 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)] lg:grid-cols-[1.1fr_0.9fr]"
       >
         <div className="flex flex-col gap-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             Pricing teaser
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Flexible plans for creator teams and enterprises.
           </h2>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-slate-600">
             Start with a pilot, then scale to high-volume metadata production
             with advanced governance.
           </p>
-          <ul className="space-y-2 text-sm text-slate-300">
+          <ul className="space-y-2 text-sm text-slate-600">
             <li className="flex gap-3">
-              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-300" />
+              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-indigo-500" />
               <span>Unlimited metadata variants per video.</span>
             </li>
             <li className="flex gap-3">
-              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-300" />
+              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-indigo-500" />
               <span>Team roles, approvals, and audit trails.</span>
             </li>
             <li className="flex gap-3">
-              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-emerald-300" />
+              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-indigo-500" />
               <span>Dedicated success manager for launch.</span>
             </li>
           </ul>
         </div>
-        <div className="flex flex-col justify-between gap-6 rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-6">
+        <div className="flex flex-col justify-between gap-6 rounded-2xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50 via-white to-sky-50 p-6 shadow-[0_15px_40px_-35px_rgba(15,23,42,0.35)]">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">
+            <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
               Team pilot
             </p>
-            <p className="mt-2 text-4xl font-semibold text-white">
+            <p className="mt-2 text-4xl font-semibold text-slate-900">
               $1,200<span className="text-base font-normal">/month</span>
             </p>
-            <p className="mt-2 text-sm text-slate-200">
+            <p className="mt-2 text-sm text-slate-600">
               Ideal for 5-15 creators with weekly publishing cadence.
             </p>
           </div>
           <Link
-            className="rounded-full bg-emerald-400 px-5 py-2 text-center text-sm font-semibold text-slate-950"
+            className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-5 py-2 text-center text-sm font-semibold text-white shadow-[0_10px_25px_-15px_rgba(79,70,229,0.7)] transition hover:from-indigo-500 hover:to-sky-400"
             href="#final-cta"
           >
             Request pricing details
@@ -454,10 +457,10 @@ export default function Home() {
 
       <section id="faq" className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <p className="text-sm uppercase tracking-[0.2em] text-emerald-300">
+          <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
             FAQ
           </p>
-          <h2 className="text-3xl font-semibold text-white">
+          <h2 className="text-3xl font-semibold text-slate-950">
             Questions teams ask before switching metadata workflows.
           </h2>
         </div>
@@ -465,12 +468,12 @@ export default function Home() {
           {faqItems.map((item) => (
             <details
               key={item.question}
-              className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
+              className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-[0_15px_45px_-35px_rgba(15,23,42,0.35)]"
             >
-              <summary className="cursor-pointer text-sm font-semibold text-white">
+              <summary className="cursor-pointer text-sm font-semibold text-slate-900">
                 {item.question}
               </summary>
-              <p className="mt-3 text-sm text-slate-300">{item.answer}</p>
+              <p className="mt-3 text-sm text-slate-600">{item.answer}</p>
             </details>
           ))}
         </div>
@@ -478,22 +481,22 @@ export default function Home() {
 
       <section
         id="final-cta"
-        className="rounded-3xl border border-emerald-400/40 bg-emerald-500/10 p-8"
+        className="rounded-3xl border border-indigo-200/80 bg-gradient-to-r from-indigo-50 via-white to-sky-50 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)]"
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-emerald-200">
+            <p className="text-xs uppercase tracking-[0.3em] text-indigo-500">
               Final CTA
             </p>
-            <h2 className="mt-2 text-3xl font-semibold text-white">
+            <h2 className="mt-2 text-3xl font-semibold text-slate-950">
               Bring clarity and speed to your metadata pipeline.
             </h2>
-            <p className="mt-2 text-sm text-slate-200">
+            <p className="mt-2 text-sm text-slate-600">
               Schedule a guided walkthrough tailored to your team.
             </p>
           </div>
           <Link
-            className="rounded-full bg-emerald-400 px-6 py-2 text-sm font-semibold text-slate-950"
+            className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-6 py-2 text-sm font-semibold text-white shadow-[0_12px_30px_-20px_rgba(79,70,229,0.75)] transition hover:from-indigo-500 hover:to-sky-400"
             href="mailto:hello@videometagenerate.com"
           >
             Schedule a walkthrough
@@ -501,27 +504,27 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="flex flex-col gap-4 border-t border-slate-800 pt-6 text-sm text-slate-400">
+      <footer className="flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
             Video Meta Generate
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link className="hover:text-white" href="/privacy">
+            <Link className="transition hover:text-slate-900" href="/privacy">
               Privacy
             </Link>
-            <Link className="hover:text-white" href="/terms">
+            <Link className="transition hover:text-slate-900" href="/terms">
               Terms
             </Link>
             <Link
-              className="hover:text-white"
+              className="transition hover:text-slate-900"
               href="mailto:contact@videometagenerate.com"
             >
               Contact
             </Link>
           </div>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-400">
           Built for teams publishing video content across global markets.
         </p>
       </footer>

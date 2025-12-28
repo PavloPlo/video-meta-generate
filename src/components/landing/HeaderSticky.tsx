@@ -15,21 +15,21 @@ export default function HeaderSticky() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-4 z-20 rounded-2xl border border-slate-800 bg-slate-950/80 p-4 backdrop-blur">
+    <header className="sticky top-4 z-20 rounded-3xl border border-slate-200/80 bg-white/80 p-4 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.5)] backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
             Video Meta Generate
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             Metadata intelligence for modern video teams.
           </p>
         </div>
-        <nav className="hidden items-center gap-4 text-sm text-slate-300 md:flex">
+        <nav className="hidden items-center gap-4 text-sm text-slate-600 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              className="transition hover:text-white"
+              className="transition hover:text-slate-950"
               href={link.href}
             >
               {link.label}
@@ -38,13 +38,13 @@ export default function HeaderSticky() {
         </nav>
         <div className="flex items-center gap-3">
           <Link
-            className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+            className="rounded-full bg-gradient-to-r from-indigo-600 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-15px_rgba(79,70,229,0.8)] transition hover:from-indigo-500 hover:to-sky-400"
             href="#final-cta"
           >
             Book a demo
           </Link>
           <button
-            className="inline-flex items-center justify-center rounded-full border border-slate-800 p-2 text-slate-200 transition hover:border-slate-600 md:hidden"
+            className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-2 text-slate-700 transition hover:border-slate-300 md:hidden"
             onClick={() => setMenuOpen((open) => !open)}
             aria-expanded={menuOpen}
             aria-label="Toggle navigation"
@@ -68,11 +68,11 @@ export default function HeaderSticky() {
         </div>
       </div>
       {menuOpen ? (
-        <div className="mt-4 flex flex-col gap-3 border-t border-slate-800/70 pt-4 text-sm text-slate-300 md:hidden">
+        <div className="mt-4 flex flex-col gap-3 border-t border-slate-200/70 pt-4 text-sm text-slate-600 md:hidden">
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              className="transition hover:text-white"
+              className="transition hover:text-slate-950"
               href={link.href}
               onClick={() => setMenuOpen(false)}
             >
