@@ -30,6 +30,39 @@ Open [http://localhost:3000](http://localhost:3000) to view the UI.
 - `npm run start` – Run the production server after building.
 - `npm run lint` – Run Next.js lint checks.
 
+## Local DB (Docker)
+
+Start DB:
+
+```bash
+docker compose up -d
+```
+
+Stop DB:
+
+```bash
+docker compose down
+```
+
+Stop + wipe DB (destructive):
+
+```bash
+docker compose down -v
+```
+
+Set `.env.local`:
+
+```bash
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/app?schema=public"
+DIRECT_URL="postgresql://postgres:postgres@localhost:5432/app?schema=public"
+```
+
+Prisma / Next integration notes
+
+With Option A env validation, both URLs must be set in `.env.local`.
+
+Prisma will use `DIRECT_URL` for migrations once schema is added (Task 1.3).
+
 ## Project structure
 
 ```
