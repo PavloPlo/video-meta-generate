@@ -7,10 +7,7 @@ on:
         description: "Git ref (branch/tag) to deploy"
         required: true
         default: "dev"
-      confirm:
-        description: "Type DEPLOY to confirm"
-        required: true
-        default: ""
+      
 
 permissions:
   contents: read
