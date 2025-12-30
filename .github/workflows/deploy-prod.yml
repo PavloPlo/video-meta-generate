@@ -12,6 +12,27 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Debug deploy variables
+        env:
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          PROD_DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+          SESSION_COOKIE_NAME: ${{ secrets.SESSION_COOKIE_NAME }}
+          SESSION_TTL_DAYS: ${{ secrets.SESSION_TTL_DAYS }}
+        run: |
+          set -e
+          check_var() {
+            local name="$1"
+            local value="$2"
+            if [ -n "$value" ]; then
+              echo "$name: set (length ${#value})"
+            else
+              echo "$name: missing"
+            fi
+          }
+          check_var "PROD_DATABASE_URL" "$PROD_DATABASE_URL"
+          check_var "PROD_DIRECT_URL" "$PROD_DIRECT_URL"
+          check_var "SESSION_COOKIE_NAME" "$SESSION_COOKIE_NAME"
+          check_var "SESSION_TTL_DAYS" "$SESSION_TTL_DAYS"
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:

@@ -31,6 +31,31 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
+      - name: Debug deploy variables
+        env:
+          STAGING_SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          STAGING_SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+          STAGING_SSH_PORT: ${{ secrets.STAGING_SSH_PORT }}
+          STAGING_SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+          IMAGE: ${{ env.IMAGE }}
+          APP_DIR: ${{ env.APP_DIR }}
+        run: |
+          set -e
+          check_var() {
+            local name="$1"
+            local value="$2"
+            if [ -n "$value" ]; then
+              echo "$name: set (length ${#value})"
+            else
+              echo "$name: missing"
+            fi
+          }
+          check_var "STAGING_SSH_HOST" "$STAGING_SSH_HOST"
+          check_var "STAGING_SSH_USER" "$STAGING_SSH_USER"
+          check_var "STAGING_SSH_PORT" "$STAGING_SSH_PORT"
+          check_var "STAGING_SSH_PRIVATE_KEY" "$STAGING_SSH_PRIVATE_KEY"
+          check_var "IMAGE" "$IMAGE"
+          check_var "APP_DIR" "$APP_DIR"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
