@@ -21,7 +21,6 @@ jobs:
   build-and-deploy:
     environment: staging
     runs-on: self-hosted
-    if: ${{ github.event.inputs.confirm == 'DEPLOY' }}
 
     env:
       APP_DIR: /srv/apps/video-meta-generate
