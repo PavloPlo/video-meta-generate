@@ -1,41 +1,66 @@
-name: Deploy Staging
+name: Deploy (staging)
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref (branch/tag) to deploy"
+        required: true
+        default: "dev"
+      confirm:
+        description: "Type DEPLOY to confirm"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    environment: staging
+    if: ${{ github.event.inputs.confirm == 'DEPLOY' }}
+
+    env:
+      APP_DIR: /srv/apps/video-meta-generate
+      IMAGE: ghcr.io/${{ github.repository }}:staging
+
     steps:
-      - name: Check out repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          ref: ${{ github.event.inputs.ref }}
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-        env:
-          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy database migrations
-        run: npm run db:deploy
-        env:
-          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
-          SESSION_COOKIE_NAME: ${{ secrets.SESSION_COOKIE_NAME }}
-          SESSION_TTL_DAYS: ${{ secrets.SESSION_TTL_DAYS }}
-          NODE_ENV: production
+      - name: Build & push image (staging tag)
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ env.IMAGE }}
 
-      - name: Deploy staging
-        run: echo "TODO: add staging deploy"
+      - name: Deploy on server via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.STAGING_SSH_HOST }}
+          username: ${{ secrets.STAGING_SSH_USER }}
+          port: ${{ secrets.STAGING_SSH_PORT }}
+          key: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd "${APP_DIR}"
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
