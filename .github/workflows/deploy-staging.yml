@@ -33,10 +33,6 @@ jobs:
           ref: ${{ github.event.inputs.ref }}
       - name: Debug deploy variables
         env:
-          STAGING_SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
-          STAGING_SSH_USER: ${{ secrets.STAGING_SSH_USER }}
-          STAGING_SSH_PORT: ${{ secrets.STAGING_SSH_PORT }}
-          STAGING_SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
           IMAGE: ${{ env.IMAGE }}
           APP_DIR: ${{ env.APP_DIR }}
         run: |
@@ -50,10 +46,6 @@ jobs:
               echo "$name: missing"
             fi
           }
-          check_var "STAGING_SSH_HOST" "$STAGING_SSH_HOST"
-          check_var "STAGING_SSH_USER" "$STAGING_SSH_USER"
-          check_var "STAGING_SSH_PORT" "$STAGING_SSH_PORT"
-          check_var "STAGING_SSH_PRIVATE_KEY" "$STAGING_SSH_PRIVATE_KEY"
           check_var "IMAGE" "$IMAGE"
           check_var "APP_DIR" "$APP_DIR"
 
@@ -73,16 +65,10 @@ jobs:
           push: true
           tags: ${{ env.IMAGE }}
 
-      - name: Deploy on server via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.STAGING_SSH_HOST }}
-          username: ${{ secrets.STAGING_SSH_USER }}
-          port: ${{ secrets.STAGING_SSH_PORT }}
-          key: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
-          script: |
-            set -e
-            cd "${APP_DIR}"
-            docker compose pull
-            docker compose up -d
-            docker image prune -f
+      - name: Deploy on runner host
+        run: |
+          set -e
+          cd "${APP_DIR}"
+          docker compose pull
+          docker compose up -d
+          docker image prune -f
