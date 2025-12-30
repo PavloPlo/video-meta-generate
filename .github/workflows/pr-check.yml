@@ -6,6 +6,7 @@ on:
 
 jobs:
   migrate-from-scratch:
+    environment: ci
     runs-on: self-hosted
     services:
       postgres:
