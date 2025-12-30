@@ -38,4 +38,4 @@ jobs:
           NODE_ENV: production
 
       - name: Deploy staging
-        run: echo "TODO: add staging deploy"
+        run: echo "TODO add staging deploy"
