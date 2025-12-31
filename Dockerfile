@@ -25,7 +25,7 @@ ARG DIRECT_URL
 ENV DATABASE_URL=${DATABASE_URL}
 ENV DIRECT_URL=${DIRECT_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN echo "DATABASE_URL: $DATABASE_URL" && echo "DIRECT_URL: $DIRECT_URL" && npm run db:generate
+RUN npm run db:generate
 RUN npm run build
 
 FROM node:20-alpine AS runner
