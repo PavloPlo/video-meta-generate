@@ -1,6 +1,21 @@
 version: "3.9"
 
 services:
+  app:
+    image: ${IMAGE:-video-meta-generate:local}
+    build:
+      context: .
+    container_name: video_meta_generate_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/app?schema=public
+      NEXT_TELEMETRY_DISABLED: "1"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:16-alpine
     container_name: app_postgres
