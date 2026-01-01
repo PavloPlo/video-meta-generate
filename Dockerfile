@@ -19,6 +19,7 @@ COPY tailwind.config.ts ./
 COPY prisma.config.ts ./
 COPY src ./src
 COPY prisma ./prisma
+COPY scripts ./scripts
 
 ARG DATABASE_URL
 ARG DIRECT_URL
@@ -42,6 +43,8 @@ COPY --from=builder /app/next.config.js ./next.config.js
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 
