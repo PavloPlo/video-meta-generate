@@ -101,7 +101,7 @@ jobs:
           echo "Running database migrations..."
           echo "DATABASE_URL is set: $(if [ -n \"${{ env.DATABASE_URL }}\" ]; then echo 'YES'; else echo 'NO'; fi)"
           echo "DIRECT_URL is set: $(if [ -n \"${{ env.DIRECT_URL }}\" ]; then echo 'YES'; else echo 'NO'; fi)"
-          docker compose run --rm -e DATABASE_URL="${{ env.DATABASE_URL }}" -e DIRECT_URL="${{ env.DIRECT_URL }}" app sh -c "echo 'Creating .env file for Prisma...' && echo 'DATABASE_URL='\$DATABASE_URL > /app/.env && echo 'DIRECT_URL='\$DIRECT_URL >> /app/.env && echo 'Verifying .env file...' && cat /app/.env | sed 's/:\/\/.*@/:\/\/***:***@/' && echo 'Verifying environment variables in shell...' && echo 'DIRECT_URL in shell:' \${DIRECT_URL:+SET} && echo 'DATABASE_URL in shell:' \${DATABASE_URL:+SET} && echo 'Testing Prisma config loading...' && node -e \"require('./prisma.config.ts')\" 2>&1 || echo 'Config test completed' && echo 'Running: npm run db:deploy' && cd /app && npm run db:deploy"
+          docker compose run --rm -e DATABASE_URL="${{ env.DATABASE_URL }}" -e DIRECT_URL="${{ env.DIRECT_URL }}" app sh -c "cd /app && echo 'Creating .env file for Prisma...' && echo 'DATABASE_URL='\$DATABASE_URL > .env && echo 'DIRECT_URL='\$DIRECT_URL >> .env && echo 'Verifying .env file...' && cat .env | sed 's/:\/\/.*@/:\/\/***:***@/' && echo 'Verifying environment variables...' && echo 'DIRECT_URL:' \${DIRECT_URL:+SET} && echo 'DATABASE_URL:' \${DATABASE_URL:+SET} && echo 'Running Prisma migrate deploy with explicit env vars...' && DIRECT_URL=\$DIRECT_URL DATABASE_URL=\$DATABASE_URL npm run db:deploy"
           echo "Starting application..."
           docker compose up -d app
           echo "Cleaning up unused images..."
