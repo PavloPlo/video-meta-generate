@@ -5,19 +5,38 @@ APP_DIR="/srv/apps/video-meta-generate"
 LOG_DIR="/var/log/video-meta-generate"
 USER=$(whoami)
 
-echo "Setting up deployment directory..."
-sudo mkdir -p "${APP_DIR}"
-sudo mkdir -p "${LOG_DIR}"
-sudo chown -R ${USER}:${USER} "${APP_DIR}"
-sudo chown -R ${USER}:${USER} "${LOG_DIR}"
+echo "Verifying deployment setup for user: ${USER}..."
 
-echo "Installing PM2 globally..."
-npm install -g pm2
+# Check if directories exist and are owned by current user
+if [ ! -d "${APP_DIR}" ]; then
+  echo "❌ ERROR: ${APP_DIR} does not exist"
+  exit 1
+fi
 
-echo "Setting up PM2 startup script..."
-pm2 startup systemd -u ${USER} --hp /home/${USER} || true
+if [ ! -d "${LOG_DIR}" ]; then
+  echo "❌ ERROR: ${LOG_DIR} does not exist"
+  exit 1
+fi
 
-echo "Setup complete!"
+# Check ownership (should be owned by current user)
+if ! sudo stat -c '%U' "${APP_DIR}" | grep -q "^${USER}$"; then
+  echo "⚠️  WARNING: ${APP_DIR} not owned by ${USER}"
+fi
+
+if ! sudo stat -c '%U' "${LOG_DIR}" | grep -q "^${USER}$"; then
+  echo "⚠️  WARNING: ${LOG_DIR} not owned by ${USER}"
+fi
+
+# Check if PM2 is available
+if ! command -v pm2 &> /dev/null; then
+  echo "⚠️  WARNING: PM2 not found in PATH"
+else
+  echo "✅ PM2 is available"
+fi
+
+echo "Setup verification complete!"
 echo "Deployment directory: ${APP_DIR}"
 echo "Log directory: ${LOG_DIR}"
+echo ""
+echo "Note: PM2 and systemd setup should be done separately as root/deploy user"
 

@@ -145,43 +145,45 @@ git push origin release-1.0.0
 
 Before first deployment, prepare your server:
 
-1. **Create deploy user and switch to it:**
+1. **Create deploy user:**
    ```bash
    sudo useradd -m -s /bin/bash deploy
-   sudo usermod -aG sudo deploy  # optional, for admin access
    sudo -u deploy -H bash -lc 'cd ~ && pwd'  # test user works
    ```
 
-2. **Switch to deploy user and run setup:**
+2. **Setup Node.js and PM2 as deploy user:**
    ```bash
-   sudo -u deploy -H bash -lc '
-     # Install Node.js 20
-     curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-     sudo apt-get install -y nodejs
+   # Install Node.js 20 (as root)
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+   sudo apt-get install -y nodejs
 
-     # Install PM2 and setup systemd
+   # Install PM2 and setup systemd as deploy user
+   sudo -u deploy -H bash -lc '
      npm install -g pm2
      pm2 startup systemd -u deploy --hp /home/deploy
-
-     # Run setup script
-     cd /path/to/your/repo
-     bash scripts/setup-server.sh
    '
    ```
 
-3. **Create deployment directories (as root):**
+3. **Create deployment directories and run setup script:**
    ```bash
+   # Create directories and set ownership
    sudo mkdir -p /srv/apps/video-meta-generate
    sudo mkdir -p /srv/apps/video-meta-generate-prod
    sudo chown -R deploy:deploy /srv/apps/video-meta-generate
    sudo chown -R deploy:deploy /srv/apps/video-meta-generate-prod
+
+   # Run setup verification as deploy user
+   sudo -u deploy -H bash -lc '
+     cd /path/to/your/repo
+     bash scripts/setup-server.sh
+   '
    ```
 
 4. **Setup GitHub Actions self-hosted runner:**
    - Go to repository Settings → Actions → Runners
    - Click "New self-hosted runner"
    - Follow Linux installation instructions
-   - **Important:** Configure runner to run as deploy user if possible
+   - **Important:** Configure runner to run as the `deploy` user (or ensure it has access to PM2 and deployment directories)
 
 ### Required GitHub Secrets
 
@@ -225,20 +227,20 @@ pm2 restart video-meta-generate
 ### Troubleshooting
 
 **Application won't start:**
-- Check logs: `sudo -u deploy pm2 logs video-meta-generate`
+- Check logs: `pm2 logs video-meta-generate`
 - Verify env file: `cat /srv/apps/video-meta-generate/current/.env`
-- Check Node version: `sudo -u deploy node --version` (should be 20.x)
-- Check PM2 status: `sudo -u deploy pm2 status`
+- Check Node version: `node --version` (should be 20.x)
+- Check PM2 status: `pm2 status`
 
 **PM2 user/permission issues:**
-- PM2 commands must run as deploy user: `sudo -u deploy pm2 status`
-- Check PM2 home: `sudo -u deploy env | grep PM2_HOME`
+- PM2 commands should run as the deploy user (configure GitHub Actions runner accordingly)
+- Check PM2 home: `env | grep PM2_HOME`
 - Verify systemd service: `sudo systemctl status pm2-deploy`
 
 **Database connection issues:**
 - Verify GitHub Secrets are set correctly
 - Test connection from server to Supabase
-- Check migration status: `cd /srv/apps/video-meta-generate/current && sudo -u deploy npm run db:status`
+- Check migration status: `cd /srv/apps/video-meta-generate/current && npm run db:status`
 
 **Deployment directory issues:**
 - Verify files exist: `ls -la /srv/apps/video-meta-generate/current/`

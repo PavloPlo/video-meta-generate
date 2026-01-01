@@ -77,15 +77,13 @@ jobs:
 
       - name: Restart application
         run: |
-          sudo -u deploy -H bash -lc "
-            export PM2_APP_NAME=video-meta-generate-prod
-            export PM2_APP_DIR=\"${APP_DIR}/current\"
-            cd \"\$PM2_APP_DIR\"
-            /usr/local/bin/pm2 delete video-meta-generate-prod || true
-            /usr/local/bin/pm2 start ecosystem.config.js --update-env
-            /usr/local/bin/pm2 save
-            /usr/local/bin/pm2 status
-          "
+          export PM2_APP_NAME=video-meta-generate-prod
+          export PM2_APP_DIR="${APP_DIR}/current"
+          cd "$PM2_APP_DIR"
+          /usr/local/bin/pm2 delete video-meta-generate-prod || true
+          /usr/local/bin/pm2 start ecosystem.config.js --update-env
+          /usr/local/bin/pm2 save
+          /usr/local/bin/pm2 status
 
       - name: Cleanup old deployments
         run: |
