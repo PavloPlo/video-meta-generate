@@ -39,33 +39,26 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Set database URLs
-        env:
-          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
-        run: |
-          # Export to GITHUB_ENV for use in subsequent steps
-          # Use printf to properly handle special characters
-          printf 'DATABASE_URL=%s\n' "${DATABASE_URL}" >> $GITHUB_ENV
-          printf 'DIRECT_URL=%s\n' "${DIRECT_URL}" >> $GITHUB_ENV
-
       - name: Install dependencies
         run: npm ci
 
       - name: Generate Prisma Client
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          DIRECT_URL: ${{ env.DIRECT_URL }}
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
         run: npm run db:generate
 
       - name: Build application
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          DIRECT_URL: ${{ env.DIRECT_URL }}
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
           NODE_ENV: production
         run: npm run build
 
       - name: Create deployment package
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
         run: |
           set -e
           DEPLOY_DIR="${APP_DIR}/deploy-$(date +%s)"
@@ -84,9 +77,8 @@ jobs:
           cp ecosystem.config.js "${DEPLOY_DIR}/" 2>/dev/null || true
           
           # Create .env file for runtime
-          echo "DATABASE_URL=${DATABASE_URL}" > "${DEPLOY_DIR}/.env"
-          echo "DIRECT_URL=${DIRECT_URL}" >> "${DEPLOY_DIR}/.env"
-          echo "NODE_ENV=production" >> "${DEPLOY_DIR}/.env"
+          # Use Node.js to write the file to avoid shell expansion issues with special characters
+          node -e "const fs=require('fs');fs.writeFileSync('${DEPLOY_DIR}/.env',\`DATABASE_URL=\${process.env.DATABASE_URL}\\nDIRECT_URL=\${process.env.DIRECT_URL}\\nNODE_ENV=production\\n\`);"
           
           # Create symlink for quick rollback
           ln -sfn "${DEPLOY_DIR}" "${APP_DIR}/current"
@@ -94,11 +86,12 @@ jobs:
           echo "DEPLOY_DIR=${DEPLOY_DIR}" >> $GITHUB_ENV
 
       - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
         run: |
           set -e
           cd "${APP_DIR}/current"
-          export DATABASE_URL="${{ env.DATABASE_URL }}"
-          export DIRECT_URL="${{ env.DIRECT_URL }}"
           npm run db:deploy
 
       - name: Restart application with PM2
