@@ -85,9 +85,9 @@ jobs:
       - name: Copy docker-compose.yml to deployment directory
         run: |
           set -e
-          sudo mkdir -p "${APP_DIR}"
-          sudo cp docker-compose.yml "${APP_DIR}/"
-          sudo chown -R $USER:$USER "${APP_DIR}"
+          mkdir -p "${APP_DIR}"
+          cp docker-compose.yml "${APP_DIR}/"
+          chown -R $USER:$USER "${APP_DIR}"
 
       - name: Deploy on runner host
         run: |
