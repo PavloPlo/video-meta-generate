@@ -72,6 +72,7 @@ jobs:
           cp -r scripts "${DEPLOY_DIR}/"
           cp package.json "${DEPLOY_DIR}/"
           cp package-lock.json "${DEPLOY_DIR}/"
+          cp prisma.config.ts "${DEPLOY_DIR}/"
           cp next.config.js "${DEPLOY_DIR}/"
           cp tsconfig.json "${DEPLOY_DIR}/"
           cp ecosystem.config.js "${DEPLOY_DIR}/" 2>/dev/null || true
@@ -93,9 +94,11 @@ jobs:
           set -e
           cd "${APP_DIR}/current"
           
-          # Debug: Check if .env file exists and what's in it
+          # Debug: Check if necessary files exist
           echo "📋 Checking environment setup..."
           ls -la .env 2>/dev/null || echo "⚠️  No .env file found"
+          ls -la prisma.config.ts 2>/dev/null || echo "⚠️  No prisma.config.ts found"
+          ls -la prisma/schema.prisma 2>/dev/null || echo "⚠️  No schema.prisma found"
           
           # Debug: Check if env vars are set in the current shell
           if [ -n "$DATABASE_URL" ]; then
