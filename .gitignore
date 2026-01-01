@@ -33,3 +33,7 @@ pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
+
+# pm2 logs
+/logs
+*.log

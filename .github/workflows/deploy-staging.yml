@@ -77,6 +77,9 @@ jobs:
           cp tsconfig.json "${DEPLOY_DIR}/"
           cp ecosystem.config.js "${DEPLOY_DIR}/" 2>/dev/null || true
           
+          # Create logs directory
+          mkdir -p "${DEPLOY_DIR}/logs"
+          
           # Create .env file for runtime
           # Use Node.js to write the file to avoid shell expansion issues with special characters
           node -e "const fs=require('fs');fs.writeFileSync('${DEPLOY_DIR}/.env',\`DATABASE_URL=\${process.env.DATABASE_URL}\\nDIRECT_URL=\${process.env.DIRECT_URL}\\nNODE_ENV=production\\n\`);"

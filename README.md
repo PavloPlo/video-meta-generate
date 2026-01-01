@@ -119,3 +119,46 @@ endpoints in `src/app/api` for metadata generation, storage, or integrations.
 - Next.js (App Router)
 - TypeScript
 - Tailwind CSS
+
+## Deployment
+
+### Accessing Your Application
+
+After a successful deployment via GitHub Actions:
+
+1. **Default Access**: The application runs on port **3000**
+   - Direct access: `http://your-server-ip:3000`
+   - With domain: `http://your-domain.com:3000`
+
+2. **Check Application Status**: SSH into your server and run:
+   ```bash
+   pm2 status
+   pm2 logs video-meta-generate
+   ```
+
+3. **Production Setup (Recommended)**: Configure a reverse proxy (nginx/Caddy) for:
+   - HTTPS/SSL termination
+   - Clean URLs (without :3000)
+   - Better security and performance
+
+### Deployment Locations
+
+- **Application**: `/srv/apps/video-meta-generate/current`
+- **Logs**: `/srv/apps/video-meta-generate/current/logs/`
+- **PM2 Process Name**: `video-meta-generate`
+
+### Manual Deployment Commands
+
+```bash
+# View application status
+pm2 status video-meta-generate
+
+# View logs
+pm2 logs video-meta-generate
+
+# Restart application
+pm2 restart video-meta-generate
+
+# Stop application
+pm2 stop video-meta-generate
+```
