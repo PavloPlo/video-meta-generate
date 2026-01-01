@@ -1,22 +1,11 @@
-import { defineConfig } from "prisma/config";
-import * as dotenv from "dotenv";
+import { defineConfig, env } from "prisma/config";
 
-// Load .env files for local development
-dotenv.config();
-dotenv.config({ path: ".env.local" });
-
-// Prisma reads DATABASE_URL from environment variables
+// Prisma's env() helper reads from environment variables at the right time
 // For Supabase migrations: use DIRECT_URL (port 5432, bypasses PgBouncer)
 // For app connections: use DATABASE_URL (port 6543, uses PgBouncer)
-const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL or DIRECT_URL must be set");
-}
-
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    url: databaseUrl,
+    url: env("DIRECT_URL") || env("DATABASE_URL"),
   },
 });
