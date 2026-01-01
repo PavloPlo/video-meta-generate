@@ -11,14 +11,24 @@ dotenv.config({ path: ".env.local" });
 // For Supabase: DIRECT_URL bypasses PgBouncer, DATABASE_URL uses it
 // Use DIRECT_URL for migrations, fallback to DATABASE_URL
 // Read directly from process.env to ensure we get the latest value
-const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
+// IMPORTANT: This config is evaluated when Prisma loads it, so env vars must be set before
+const getDatabaseUrl = () => {
+  // Try multiple sources
+  const directUrl = process.env.DIRECT_URL;
+  const databaseUrl = process.env.DATABASE_URL;
+  const url = directUrl || databaseUrl;
+  
+  if (!url) {
+    const available = Object.keys(process.env).filter((k) => k.includes("DATABASE"));
+    const error = `DATABASE_URL or DIRECT_URL must be set. Available env vars: ${available.join(", ") || "none"}`;
+    console.error("❌ Prisma config error:", error);
+    throw new Error(error);
+  }
+  
+  return url;
+};
 
-if (!databaseUrl) {
-  const available = Object.keys(process.env).filter((k) => k.includes("DATABASE"));
-  throw new Error(
-    `DATABASE_URL or DIRECT_URL must be set. Available env vars: ${available.join(", ") || "none"}`
-  );
-}
+const databaseUrl = getDatabaseUrl();
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
