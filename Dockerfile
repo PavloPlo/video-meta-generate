@@ -2,7 +2,6 @@
 
 FROM node:20-alpine AS deps
 WORKDIR /app
-
 COPY package.json package-lock.json ./
 RUN npm ci
 
@@ -10,22 +9,17 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY package.json package-lock.json ./
-COPY next.config.js ./
-COPY next-env.d.ts ./
-COPY tsconfig.json ./
-COPY postcss.config.js ./
-COPY tailwind.config.ts ./
-COPY prisma.config.ts ./
+COPY package.json package-lock.json next.config.js tsconfig.json ./
+COPY postcss.config.js tailwind.config.ts prisma.config.ts ./
 COPY src ./src
 COPY prisma ./prisma
-COPY scripts ./scripts
 
 ARG DATABASE_URL
 ARG DIRECT_URL
 ENV DATABASE_URL=${DATABASE_URL}
 ENV DIRECT_URL=${DIRECT_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
+
 RUN npm run db:generate
 RUN npm run build
 
@@ -35,16 +29,12 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/next.config.js ./next.config.js
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package.json ./
 
 EXPOSE 3000
 

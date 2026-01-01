@@ -60,33 +60,16 @@ jobs:
           DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
         run: |
-          set -e
           DEPLOY_DIR="${APP_DIR}/deploy-$(date +%s)"
-          mkdir -p "${DEPLOY_DIR}"
-          
-          # Copy necessary files
-          cp -r .next "${DEPLOY_DIR}/"
-          cp -r node_modules "${DEPLOY_DIR}/"
-          cp -r prisma "${DEPLOY_DIR}/"
-          cp -r src "${DEPLOY_DIR}/"
-          cp -r scripts "${DEPLOY_DIR}/"
-          cp package.json "${DEPLOY_DIR}/"
-          cp package-lock.json "${DEPLOY_DIR}/"
-          cp prisma.config.ts "${DEPLOY_DIR}/"
-          cp next.config.js "${DEPLOY_DIR}/"
-          cp tsconfig.json "${DEPLOY_DIR}/"
-          cp ecosystem.config.js "${DEPLOY_DIR}/" 2>/dev/null || true
-          
-          # Create logs directory
           mkdir -p "${DEPLOY_DIR}/logs"
           
-          # Create .env file for runtime
-          # Use Node.js to write the file to avoid shell expansion issues with special characters
+          cp -r .next node_modules prisma src scripts "${DEPLOY_DIR}/"
+          cp package.json package-lock.json prisma.config.ts next.config.js tsconfig.json "${DEPLOY_DIR}/"
+          cp ecosystem.config.js "${DEPLOY_DIR}/" 2>/dev/null || true
+          
           node -e "const fs=require('fs');fs.writeFileSync('${DEPLOY_DIR}/.env',\`DATABASE_URL=\${process.env.DATABASE_URL}\\nDIRECT_URL=\${process.env.DIRECT_URL}\\nNODE_ENV=production\\n\`);"
           
-          # Create symlink for quick rollback
           ln -sfn "${DEPLOY_DIR}" "${APP_DIR}/current"
-          
           echo "DEPLOY_DIR=${DEPLOY_DIR}" >> $GITHUB_ENV
 
       - name: Run database migrations
@@ -94,62 +77,17 @@ jobs:
           DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.STAGING_DIRECT_URL }}
         run: |
-          set -e
           cd "${APP_DIR}/current"
-          
-          # Debug: Check if necessary files exist
-          echo "📋 Checking environment setup..."
-          ls -la .env 2>/dev/null || echo "⚠️  No .env file found"
-          ls -la prisma.config.ts 2>/dev/null || echo "⚠️  No prisma.config.ts found"
-          ls -la prisma/schema.prisma 2>/dev/null || echo "⚠️  No schema.prisma found"
-          
-          # Debug: Check if env vars are set in the current shell
-          if [ -n "$DATABASE_URL" ]; then
-            echo "✅ DATABASE_URL is set in shell (${#DATABASE_URL} chars)"
-          else
-            echo "❌ DATABASE_URL is NOT set in shell"
-          fi
-          
-          if [ -n "$DIRECT_URL" ]; then
-            echo "✅ DIRECT_URL is set in shell (${#DIRECT_URL} chars)"
-          else
-            echo "❌ DIRECT_URL is NOT set in shell"
-          fi
-          
           npm run db:deploy
 
-      - name: Restart application with PM2
+      - name: Restart application
         run: |
-          set -e
           cd "${APP_DIR}/current"
-          
-          # Check if PM2 is installed
-          if ! command -v pm2 &> /dev/null; then
-            echo "Installing PM2..."
-            npm install -g pm2
-          fi
-          
-          # Stop existing process if running
-          pm2 stop video-meta-generate || true
           pm2 delete video-meta-generate || true
-          
-          # Start new process
-          if [ -f ecosystem.config.js ]; then
-            pm2 start ecosystem.config.js
-          else
-            pm2 start npm --name video-meta-generate -- start
-          fi
-          
-          # Save PM2 process list
+          pm2 start ecosystem.config.js
           pm2 save
-          
-          # Show status
-          pm2 status
 
       - name: Cleanup old deployments
         run: |
-          set -e
-          # Keep last 5 deployments
           cd "${APP_DIR}"
           ls -dt deploy-* 2>/dev/null | tail -n +6 | xargs rm -rf || true
-          echo "Cleanup completed"

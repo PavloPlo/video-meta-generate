@@ -29,24 +29,30 @@ Open [http://localhost:3000](http://localhost:3000) to view the UI.
 - `npm run build` – Build the production bundle.
 - `npm run start` – Run the production server after building.
 - `npm run lint` – Run Next.js lint checks.
+- `npm run db:generate` – Generate Prisma Client.
+- `npm run db:migrate` – Run migrations in development.
+- `npm run db:deploy` – Deploy migrations (used in CI/CD).
+- `npm run db:status` – Check migration status.
+- `npm run db:reset` – Reset database (⚠️ destructive).
+- `npm run db:studio` – Open Prisma Studio.
 
 ## Local Development
 
 ### Database Setup
 
-Start local PostgreSQL database:
+Start local PostgreSQL database using Docker Compose:
 
 ```bash
 docker compose up -d
 ```
 
-Stop DB:
+Stop database:
 
 ```bash
 docker compose down
 ```
 
-Stop + wipe DB (destructive - **⚠️ This will delete all your local data**):
+Stop and wipe database (⚠️ **destructive - deletes all local data**):
 
 ```bash
 docker compose down -v
@@ -57,40 +63,38 @@ docker compose down -v
 Create a `.env.local` file in the project root:
 
 ```bash
+# Local development - Docker PostgreSQL
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/app?schema=public"
 DIRECT_URL="postgresql://postgres:postgres@localhost:5432/app?schema=public"
 ```
 
-**⚠️ Important:** Never commit `.env.local` to version control. It's already in `.gitignore`.
+**⚠️ Important:** Never commit `.env.local` to version control.
 
-### Environment Isolation
+### Environment Setup
 
-Your setup ensures different databases for each environment:
+This project uses three separate environments with different databases:
 
-- **Local Development**: Uses Docker PostgreSQL container (`localhost:5432/app`)
-- **Staging**: Uses `secrets.STAGING_DATABASE_URL` (remote database)
-- **Production**: Uses `secrets.PROD_DATABASE_URL` (remote database)
+| Environment | Database | Configuration |
+|------------|----------|--------------|
+| **Local** | Docker PostgreSQL | `.env.local` file |
+| **Staging** | Supabase | GitHub Secrets: `STAGING_DATABASE_URL`, `STAGING_DIRECT_URL` |
+| **Production** | Supabase | GitHub Secrets: `PROD_DATABASE_URL`, `PROD_DIRECT_URL` |
 
-**Environment Variables Required:**
-- `DATABASE_URL` and `DIRECT_URL` must be set for all environments
-- Local development reads from `.env.local`
-- Staging/Production read from GitHub Secrets
+### Quick Setup Script
 
-### Prisma Commands
+For automated setup, run:
 
 ```bash
-# Generate Prisma client (local)
-npm run db:generate
-
-# Run migrations in development
-npm run db:migrate
-
-# Reset database (⚠️ destructive)
-npm run db:reset
-
-# View database in browser
-npm run db:studio
+bash scripts/setup-local.sh
 ```
+
+This script will:
+- Check Docker is running
+- Create `.env.local` if missing
+- Start PostgreSQL with Docker Compose
+- Install dependencies
+- Generate Prisma Client
+- Run migrations
 
 ## Project structure
 
@@ -122,43 +126,96 @@ endpoints in `src/app/api` for metadata generation, storage, or integrations.
 
 ## Deployment
 
-### Accessing Your Application
+This project uses GitHub Actions for automated deployments to staging and production environments.
 
-After a successful deployment via GitHub Actions:
+### Quick Deploy
 
-1. **Default Access**: The application runs on port **3000**
-   - Direct access: `http://your-server-ip:3000`
-   - With domain: `http://your-domain.com:3000`
+**Deploy to Staging:**
+```bash
+git push origin dev
+```
 
-2. **Check Application Status**: SSH into your server and run:
+**Deploy to Production:**
+```bash
+git tag release-1.0.0
+git push origin release-1.0.0
+```
+
+### Server Setup
+
+Before first deployment, prepare your server:
+
+1. **Install Node.js 20 and PM2:**
    ```bash
-   pm2 status
-   pm2 logs video-meta-generate
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   npm install -g pm2
+   pm2 startup systemd
    ```
 
-3. **Production Setup (Recommended)**: Configure a reverse proxy (nginx/Caddy) for:
-   - HTTPS/SSL termination
-   - Clean URLs (without :3000)
-   - Better security and performance
+2. **Create deployment directories:**
+   ```bash
+   sudo mkdir -p /srv/apps/video-meta-generate
+   sudo mkdir -p /srv/apps/video-meta-generate-prod
+   sudo chown -R $(whoami):$(whoami) /srv/apps/video-meta-generate
+   sudo chown -R $(whoami):$(whoami) /srv/apps/video-meta-generate-prod
+   ```
+
+3. **Setup GitHub Actions self-hosted runner:**
+   - Go to repository Settings → Actions → Runners
+   - Click "New self-hosted runner"
+   - Follow Linux installation instructions
+
+### Required GitHub Secrets
+
+Configure in Settings → Secrets and variables → Actions:
+
+| Secret | Description | Example |
+|--------|-------------|---------|
+| `STAGING_DATABASE_URL` | Supabase pooling URL (staging) | `postgresql://...@...pooler.supabase.com:6543/postgres` |
+| `STAGING_DIRECT_URL` | Supabase direct URL (staging) | `postgresql://...@...pooler.supabase.com:5432/postgres` |
+| `PROD_DATABASE_URL` | Supabase pooling URL (production) | `postgresql://...@...pooler.supabase.com:6543/postgres` |
+| `PROD_DIRECT_URL` | Supabase direct URL (production) | `postgresql://...@...pooler.supabase.com:5432/postgres` |
 
 ### Deployment Locations
 
-- **Application**: `/srv/apps/video-meta-generate/current`
-- **Logs**: `/srv/apps/video-meta-generate/current/logs/`
-- **PM2 Process Name**: `video-meta-generate`
+| Environment | Path | PM2 Process | Port |
+|-------------|------|-------------|------|
+| **Staging** | `/srv/apps/video-meta-generate/current` | `video-meta-generate` | 3000 |
+| **Production** | `/srv/apps/video-meta-generate-prod/current` | `video-meta-generate-prod` | 3000 |
 
-### Manual Deployment Commands
+### Common Commands
 
 ```bash
-# View application status
-pm2 status video-meta-generate
+# Check status
+pm2 status
 
 # View logs
-pm2 logs video-meta-generate
+pm2 logs video-meta-generate         # Staging
+pm2 logs video-meta-generate-prod    # Production
 
-# Restart application
+# Restart
+pm2 restart video-meta-generate      # Staging
+pm2 restart video-meta-generate-prod # Production
+
+# Rollback to previous deployment
+cd /srv/apps/video-meta-generate
+ls -lt | grep deploy-
+ln -sfn deploy-[previous-timestamp] current
 pm2 restart video-meta-generate
-
-# Stop application
-pm2 stop video-meta-generate
 ```
+
+### Troubleshooting
+
+**Application won't start:**
+- Check logs: `pm2 logs video-meta-generate`
+- Verify env file: `cat /srv/apps/video-meta-generate/current/.env`
+- Check Node version: `node --version` (should be 20.x)
+
+**Database connection issues:**
+- Verify GitHub Secrets are set correctly
+- Test connection from server to Supabase
+- Check migration status: `npm run db:status`
+
+**Rollback procedure:**
+Each deployment creates a timestamped directory. List them with `ls -lt | grep deploy-`, then update the `current` symlink to point to a previous deployment and restart PM2.

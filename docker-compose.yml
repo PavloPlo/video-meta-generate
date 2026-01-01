@@ -1,22 +1,21 @@
 services:
-  app:
-    image: ${IMAGE:-ghcr.io/video-meta-generate:dev}
-    build:
-      context: .
-      args:
-        DATABASE_URL: ${DATABASE_URL}
-        DIRECT_URL: ${DIRECT_URL}
-    container_name: app_nextjs
+  postgres:
+    image: postgres:16-alpine
+    container_name: video-meta-db
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "5432:5432"
     environment:
-      DATABASE_URL: ${DATABASE_URL}
-      DIRECT_URL: ${DIRECT_URL}
-      NODE_ENV: "production"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

@@ -17,11 +17,7 @@ module.exports = {
       merge_logs: true,
       autorestart: true,
       max_memory_restart: "1G",
-      min_uptime: "10s",
-      max_restarts: 10,
       watch: false,
-      ignore_watch: ["node_modules", ".next", "logs"],
     },
   ],
 };
-

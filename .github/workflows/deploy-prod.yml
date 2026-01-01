@@ -1,57 +1,88 @@
-name: Deploy Production
+name: Deploy (production)
 
 on:
   push:
     tags:
       - "release-*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  build-and-deploy:
     environment: production
     runs-on: self-hosted
+
+    env:
+      APP_DIR: /srv/apps/video-meta-generate-prod
+      NODE_ENV: production
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Debug deploy variables
-        env:
-          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
-          PROD_DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
-          SESSION_COOKIE_NAME: ${{ secrets.SESSION_COOKIE_NAME }}
-          SESSION_TTL_DAYS: ${{ secrets.SESSION_TTL_DAYS }}
-        run: |
-          set -e
-          check_var() {
-            local name="$1"
-            local value="$2"
-            if [ -n "$value" ]; then
-              echo "$name: set (length ${#value})"
-            else
-              echo "$name: missing"
-            fi
-          }
-          check_var "PROD_DATABASE_URL" "$PROD_DATABASE_URL"
-          check_var "PROD_DIRECT_URL" "$PROD_DIRECT_URL"
-          check_var "SESSION_COOKIE_NAME" "$SESSION_COOKIE_NAME"
-          check_var "SESSION_TTL_DAYS" "$SESSION_TTL_DAYS"
-      - name: Set up Node.js
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      - name: Generate Prisma client
+
+      - name: Generate Prisma Client
         env:
           DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
-        run: npx prisma generate
-      - name: Deploy database migrations
+        run: npm run db:generate
+
+      - name: Build application
         env:
           DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
-          SESSION_COOKIE_NAME: ${{ secrets.SESSION_COOKIE_NAME }}
-          SESSION_TTL_DAYS: ${{ secrets.SESSION_TTL_DAYS }}
           NODE_ENV: production
-        run: npm run db:deploy
-      - name: Deploy application
-        run: echo "TODO: add production deployment steps"
+        run: npm run build
+
+      - name: Create deployment package
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+        run: |
+          DEPLOY_DIR="${APP_DIR}/deploy-$(date +%s)"
+          mkdir -p "${DEPLOY_DIR}/logs"
+          
+          cp -r .next node_modules prisma src scripts "${DEPLOY_DIR}/"
+          cp package.json package-lock.json prisma.config.ts next.config.js tsconfig.json "${DEPLOY_DIR}/"
+          cp ecosystem.config.js "${DEPLOY_DIR}/" 2>/dev/null || true
+          
+          node -e "const fs=require('fs');fs.writeFileSync('${DEPLOY_DIR}/.env',\`DATABASE_URL=\${process.env.DATABASE_URL}\\nDIRECT_URL=\${process.env.DIRECT_URL}\\nNODE_ENV=production\\n\`);"
+          
+          ln -sfn "${DEPLOY_DIR}" "${APP_DIR}/current"
+          echo "DEPLOY_DIR=${DEPLOY_DIR}" >> $GITHUB_ENV
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+        run: |
+          cd "${APP_DIR}/current"
+          npm run db:deploy
+
+      - name: Restart application
+        run: |
+          cd "${APP_DIR}/current"
+          pm2 delete video-meta-generate-prod || true
+          pm2 start ecosystem.config.js --name video-meta-generate-prod
+          pm2 save
+
+      - name: Cleanup old deployments
+        run: |
+          cd "${APP_DIR}"
+          ls -dt deploy-* 2>/dev/null | tail -n +6 | xargs rm -rf || true
