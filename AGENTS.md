@@ -480,6 +480,12 @@ export const FormActions = ({ onCancel, onSubmit, loading }) => (
 - ✅ **Test coverage maintained**: Unit/component tests added for new logic
 - ✅ **API standards**: Route handlers follow validation, error handling, and response patterns
 
+## Commit message guidelines
+- **Keep commit messages short and concise**
+- **Include Functional Requirements (FR)**: When user inputs contain functional requirements marked with `FR`, include them in the commit message
+- Example: `feat: Add video metadata form (FR: Support YouTube metadata generation)`
+- Use conventional commit format when applicable (feat, fix, refactor, docs, etc.)
+
 ## When unsure
 - Follow existing patterns in the repo.
 - Choose the simplest solution that keeps server/client boundaries clear.
