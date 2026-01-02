@@ -69,7 +69,7 @@ export const VideoPreviewPanel = ({
       </CardHeader>
       <CardContent className="flex-1 space-y-6 overflow-y-auto">
         {/* Thumbnails Section */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
             <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
             Thumbnails
@@ -94,7 +94,7 @@ export const VideoPreviewPanel = ({
         </div>
 
         {/* Description Section */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
             <span className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">2</span>
             Description
@@ -132,7 +132,7 @@ export const VideoPreviewPanel = ({
         </div>
 
         {/* Tags Section */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
             <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">3</span>
             Tags

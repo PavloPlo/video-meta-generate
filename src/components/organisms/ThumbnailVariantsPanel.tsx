@@ -178,7 +178,7 @@ export const ThumbnailVariantsPanel = ({
           onClick={handleGenerate}
           disabled={!canGenerate || isGenerating}
           size="lg"
-          className="w-full"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
         >
           {isGenerating ? "Generating all metadata..." : "Generate all metadata"}
         </Button>

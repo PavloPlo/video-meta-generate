@@ -39,7 +39,7 @@ export const ThumbnailVariantCard = ({
         className={cn(
           "relative aspect-video rounded-lg overflow-hidden border-4 transition-all cursor-pointer",
           isSelected
-            ? "border-blue-500 ring-2 ring-blue-500/20"
+            ? "border-blue-600 ring-4 ring-blue-500/30 shadow-lg"
             : "border-slate-200 hover:border-slate-300"
         )}
         onClick={onSelect}
@@ -59,7 +59,7 @@ export const ThumbnailVariantCard = ({
         {isSelected && (
           <>
             {/* Checkmark Overlay */}
-            <div className="absolute inset-0 bg-blue-500/10 flex items-center justify-center">
+            <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
               <div className="bg-blue-500 rounded-full p-2">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -69,7 +69,7 @@ export const ThumbnailVariantCard = ({
 
             {/* Selected Label */}
             <div className="absolute bottom-3 left-3">
-              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-blue-500 text-white">
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow-md">
                 Selected
               </span>
             </div>

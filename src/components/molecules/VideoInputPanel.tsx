@@ -29,7 +29,6 @@ export const VideoInputPanel = ({
   const [hookText, setHookText] = useState("");
   const [tone, setTone] = useState<HookTone>(HOOK_TONES.VIRAL);
   const [sourceAlert, setSourceAlert] = useState<InlineAlert | null>(null);
-  const [hookAlert, setHookAlert] = useState<InlineAlert | null>(null);
   const [sourceValidationMessage, setSourceValidationMessage] = useState<string | null>(null);
 
   const handleSourceTypeChange = (newSourceType: SourceType) => {
@@ -62,23 +61,6 @@ export const VideoInputPanel = ({
   const handleToneChange = (newTone: HookTone) => {
     setTone(newTone);
     onToneChange?.(newTone);
-
-    // Show alert when tone changes
-    const alert: InlineAlert = {
-      scope: 'controls',
-      kind: 'info',
-      message: `Tone set to ${newTone}`,
-      isVisible: true,
-    };
-    setHookAlert(alert);
-
-    // Clear alert after a delay (except for errors)
-    if (alert.kind !== 'error') {
-      setTimeout(() => {
-        setHookAlert({ ...alert, isVisible: false });
-        setTimeout(() => setHookAlert(null), 200); // Wait for fade out
-      }, 3000);
-    }
   };
 
   return (
@@ -86,9 +68,9 @@ export const VideoInputPanel = ({
       <CardHeader>
         <CardTitle id="inputs-heading">Create thumbnails</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 space-y-8">
+      <CardContent className="flex-1 space-y-6">
         {/* Step 1: Choose source */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
               1
@@ -124,7 +106,7 @@ export const VideoInputPanel = ({
         </div>
 
         {/* Step 2: Write hook text */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
               2
@@ -136,22 +118,11 @@ export const VideoInputPanel = ({
               hookText={hookText}
               onHookTextChange={handleHookTextChange}
             />
-            {/* Fixed alert slot for hook controls */}
-            <div className="min-h-[2.5rem] flex items-start mt-3">
-              {hookAlert && (
-                <InlineAlertComponent
-                  scope={hookAlert.scope}
-                  kind={hookAlert.kind}
-                  message={hookAlert.message}
-                  isVisible={hookAlert.isVisible}
-                />
-              )}
-            </div>
           </div>
         </div>
 
         {/* Step 3: Choose tone */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
               3
@@ -198,9 +169,6 @@ export const VideoInputPanel = ({
                 </button>
               ))}
             </div>
-            <p className="text-xs text-slate-500 mt-3">
-              Used for text style, not content meaning
-            </p>
           </div>
         </div>
 

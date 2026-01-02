@@ -131,13 +131,6 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
           assetIds={assetIds}
         />
       </div>
-
-      {/* Development helpers - remove in production */}
-      <div className="lg:col-span-2 mt-8 p-4 bg-slate-50 rounded-lg">
-        <div className="text-xs text-slate-500">
-          Source: {sourceType} | Hook: &ldquo;{hookText}&rdquo; | Tone: {tone} | Variants: {variants.length} | Selected: {selectedVariantId || 'none'}
-        </div>
-      </div>
     </div>
   );
 };
