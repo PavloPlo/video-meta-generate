@@ -135,8 +135,6 @@ export const VideoInputPanel = ({
             <HookTextControls
               hookText={hookText}
               onHookTextChange={handleHookTextChange}
-              tone={tone}
-              onToneChange={handleToneChange}
             />
             {/* Fixed alert slot for hook controls */}
             <div className="min-h-[2.5rem] flex items-start mt-3">
@@ -152,7 +150,7 @@ export const VideoInputPanel = ({
           </div>
         </div>
 
-        {/* Step 3: Choose tone - embedded in hook controls */}
+        {/* Step 3: Choose tone */}
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
@@ -160,23 +158,52 @@ export const VideoInputPanel = ({
             </div>
             <h3 className="text-sm font-medium text-slate-900">Choose tone</h3>
           </div>
-          <p className="pl-9 text-sm text-slate-600">
-            Tone selector is integrated above in the hook text section
-          </p>
+          <div className="pl-9">
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                {
+                  value: HOOK_TONES.VIRAL,
+                  label: "Viral",
+                  description: "Attention-grabbing and shareable",
+                  icon: "🔥",
+                  color: "text-red-600"
+                },
+                {
+                  value: HOOK_TONES.CURIOSITY,
+                  label: "Curiosity",
+                  description: "Spark interest and questions",
+                  icon: "❓",
+                  color: "text-blue-600"
+                },
+                {
+                  value: HOOK_TONES.EDUCATIONAL,
+                  label: "Educational",
+                  description: "Informative and helpful",
+                  icon: "🎓",
+                  color: "text-green-600"
+                },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleToneChange(option.value)}
+                  className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 ${tone === option.value
+                      ? "border-slate-600 bg-slate-50 shadow-sm"
+                      : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
+                    }`}
+                >
+                  <div className={`text-2xl mb-2 ${option.color}`}>{option.icon}</div>
+                  <div className="font-semibold text-slate-900 text-sm">{option.label}</div>
+                  <div className="text-xs text-slate-500 mt-1 leading-tight">{option.description}</div>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-slate-500 mt-3">
+              Used for text style, not content meaning
+            </p>
+          </div>
         </div>
 
-        {/* Step 4: Generate thumbnails */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
-              4
-            </div>
-            <h3 className="text-sm font-medium text-slate-900">Generate thumbnails</h3>
-          </div>
-          <p className="pl-9 text-sm text-slate-600">
-            Click the &ldquo;Generate thumbnails&rdquo; button in the Preview panel to create your variants
-          </p>
-        </div>
       </CardContent>
     </Card>
   );

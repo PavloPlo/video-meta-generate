@@ -13,6 +13,8 @@ export const VideoMetadataForm = () => {
   const [tone, setTone] = useState<HookTone>(HOOK_TONES.VIRAL);
   const [variants, setVariants] = useState<ThumbnailVariant[]>([]);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const [description, setDescription] = useState<string>('');
+  const [tags, setTags] = useState<string[]>([]);
 
   // Asset upload state (mocked for now - would be connected to actual upload system)
   const [hasVideoUploaded, setHasVideoUploaded] = useState(false);
@@ -33,6 +35,46 @@ export const VideoMetadataForm = () => {
 
   const handleVariantsChange = (newVariants: ThumbnailVariant[]) => {
     setVariants(newVariants);
+
+    // Mock generation of description and tags when thumbnails are generated
+    if (newVariants.length > 0) {
+      // Generate mock description based on tone and hook text
+      const mockDescriptions = {
+        viral: `🚀 ${hookText || 'This Changed Everything!'} 
+
+What you're about to discover will completely transform how you think about this topic. In this video, I break down the exact strategies that helped me achieve incredible results.
+
+From complete beginner to expert level - here's exactly what worked for me and how you can apply it starting today.
+
+Don't forget to like, subscribe, and hit that notification bell for more game-changing content! 🔥`,
+        curiosity: `❓ ${hookText || 'You Won\'t Believe What I Found'}
+
+Have you ever wondered why some people seem to have all the answers? Today, I'm diving deep into a discovery that completely changed my perspective.
+
+What I uncovered might surprise you, but it could be the missing piece you've been looking for. Let's explore this together and see what we can learn.
+
+Share your thoughts in the comments - what's your biggest takeaway from this?`,
+        educational: `📚 ${hookText || 'The Complete Guide You\'ve Been Waiting For'}
+
+Welcome to the most comprehensive guide on this topic. Whether you're just getting started or looking to deepen your knowledge, this video covers everything you need to know.
+
+We'll break down complex concepts into simple, actionable steps that anyone can follow. By the end of this video, you'll have a clear understanding and practical skills you can implement immediately.
+
+If you found this helpful, please give it a thumbs up and consider subscribing for more detailed tutorials!`
+      };
+
+      setDescription(mockDescriptions[tone]);
+
+      // Generate mock tags based on content
+      const baseTags = ['tutorial', 'guide', 'howto', 'tips', 'education'];
+      const toneTags = {
+        viral: ['viral', 'trending', 'mustwatch', 'gamechanger', 'lifechanging'],
+        curiosity: ['interesting', 'discovery', 'mystery', 'explained', 'revealed'],
+        educational: ['learn', 'study', 'knowledge', 'skills', 'masterclass']
+      };
+
+      setTags([...baseTags, ...toneTags[tone], '2024', 'new', 'best']);
+    }
   };
 
   const handleSelectedVariantChange = (variantId: string | null) => {
@@ -79,6 +121,8 @@ export const VideoMetadataForm = () => {
           selectedVariantId={selectedVariantId}
           onVariantsChange={handleVariantsChange}
           onSelectedVariantChange={handleSelectedVariantChange}
+          description={description}
+          tags={tags}
           hasVideoUploaded={hasVideoUploaded}
           hasImagesUploaded={hasImagesUploaded}
           assetIds={assetIds}

@@ -7,8 +7,9 @@ import type { HookTone, InlineAlert as InlineAlertType } from "@/lib/types/thumb
 export interface HookTextControlsProps {
     hookText: string;
     onHookTextChange: (value: string) => void;
-    tone: HookTone;
-    onToneChange: (value: HookTone) => void;
+    tone?: HookTone;
+    onToneChange?: (value: HookTone) => void;
+    showToneSelector?: boolean;
     className?: string;
 }
 
@@ -17,6 +18,7 @@ export const HookTextControls = ({
     onHookTextChange,
     tone,
     onToneChange,
+    showToneSelector = false,
     className,
 }: HookTextControlsProps) => {
     const [localHookText, setLocalHookText] = useState(hookText);
@@ -45,7 +47,7 @@ export const HookTextControls = ({
     };
 
     const handleToneChange = (newTone: HookTone) => {
-        onToneChange(newTone);
+        onToneChange?.(newTone);
     };
 
     const toneOptions = [
@@ -99,32 +101,34 @@ export const HookTextControls = ({
                     </div>
                 </div>
 
-                {/* Tone Selector */}
-                <div className="space-y-3">
-                    <label className="text-sm font-medium text-slate-700">
-                        Tone
-                    </label>
-                    <div className="grid grid-cols-3 gap-3">
-                        {toneOptions.map((option) => (
-                            <button
-                                key={option.value}
-                                type="button"
-                                onClick={() => handleToneChange(option.value)}
-                                className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 ${tone === option.value
-                                    ? "border-slate-600 bg-slate-50 shadow-sm"
-                                    : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
-                                    }`}
-                            >
-                                <div className={`text-2xl mb-2 ${option.color}`}>{option.icon}</div>
-                                <div className="font-semibold text-slate-900 text-sm">{option.label}</div>
-                                <div className="text-xs text-slate-500 mt-1 leading-tight">{option.description}</div>
-                            </button>
-                        ))}
+                {/* Tone Selector - conditionally rendered */}
+                {showToneSelector && tone && onToneChange && (
+                    <div className="space-y-3">
+                        <label className="text-sm font-medium text-slate-700">
+                            Tone
+                        </label>
+                        <div className="grid grid-cols-3 gap-3">
+                            {toneOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => onToneChange(option.value)}
+                                    className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 ${tone === option.value
+                                        ? "border-slate-600 bg-slate-50 shadow-sm"
+                                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
+                                        }`}
+                                >
+                                    <div className={`text-2xl mb-2 ${option.color}`}>{option.icon}</div>
+                                    <div className="font-semibold text-slate-900 text-sm">{option.label}</div>
+                                    <div className="text-xs text-slate-500 mt-1 leading-tight">{option.description}</div>
+                                </button>
+                            ))}
+                        </div>
+                        <p className="text-xs text-slate-500">
+                            Used for text style, not content meaning
+                        </p>
                     </div>
-                    <p className="text-xs text-slate-500">
-                        Used for text style, not content meaning
-                    </p>
-                </div>
+                )}
 
             </div>
         </div>

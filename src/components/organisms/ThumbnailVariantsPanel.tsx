@@ -66,7 +66,7 @@ export const ThumbnailVariantsPanel = ({
     onInlineAlert({
       scope: ALERT_SCOPES.GENERATE,
       kind: ALERT_KINDS.INFO,
-      message: `Generating ${VALIDATION_RULES.THUMBNAIL_VARIANTS_INITIAL} thumbnails...`,
+      message: "Generating thumbnails, description, and tags...",
     });
 
     try {
@@ -91,7 +91,7 @@ export const ThumbnailVariantsPanel = ({
       onInlineAlert({
         scope: ALERT_SCOPES.GENERATE,
         kind: ALERT_KINDS.SUCCESS,
-        message: "Thumbnail options ready",
+        message: "All metadata generated successfully!",
       });
     } catch (error) {
       onInlineAlert({
@@ -123,7 +123,7 @@ export const ThumbnailVariantsPanel = ({
     onInlineAlert({
       scope: ALERT_SCOPES.REGENERATE,
       kind: ALERT_KINDS.INFO,
-      message: `Adding ${count} new thumbnails...`,
+      message: `Generating ${count} more thumbnails...`,
     });
 
     try {
@@ -143,7 +143,7 @@ export const ThumbnailVariantsPanel = ({
       onInlineAlert({
         scope: ALERT_SCOPES.REGENERATE,
         kind: ALERT_KINDS.SUCCESS,
-        message: `Added ${Math.min(count, response.variants.length)} new variants`,
+        message: `Generated ${Math.min(count, response.variants.length)} more thumbnails`,
       });
     } catch (error) {
       onInlineAlert({
@@ -171,7 +171,7 @@ export const ThumbnailVariantsPanel = ({
           size="lg"
           className="w-full"
         >
-          {isGenerating ? "Generating thumbnails..." : "Generate thumbnails"}
+          {isGenerating ? "Generating all metadata..." : "Generate all metadata"}
         </Button>
 
         {/* Secondary: Regenerate - visually de-emphasized until variants exist */}
@@ -182,7 +182,7 @@ export const ThumbnailVariantsPanel = ({
             variant="outline"
             className="w-full opacity-75 hover:opacity-100 transition-opacity"
           >
-            {isRegenerating ? "Adding more thumbnails..." : "Add more thumbnails"}
+            {isRegenerating ? "Generating more thumbnails..." : "Generate more thumbnails"}
           </Button>
         )}
       </div>
