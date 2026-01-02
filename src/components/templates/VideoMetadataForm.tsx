@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { VideoInputPanel } from "@/components/molecules/VideoInputPanel";
+import { VideoInputPanel, type GenerationOptions } from "@/components/molecules/VideoInputPanel";
 import { VideoPreviewPanel } from "@/components/molecules/VideoPreviewPanel";
 import { generateThumbnails } from "@/lib/thumbnails";
 import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES, VALIDATION_RULES, ALERT_SCOPES, ALERT_KINDS } from "@/constants/video";
@@ -19,6 +19,11 @@ export const VideoMetadataForm = () => {
   const [description, setDescription] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [generationOptions, setGenerationOptions] = useState<GenerationOptions>({
+    thumbnails: true,
+    description: true,
+    tags: true,
+  });
 
   // Asset upload state (mocked for now - would be connected to actual upload system)
   const [hasVideoUploaded, setHasVideoUploaded] = useState(false);
@@ -39,36 +44,39 @@ export const VideoMetadataForm = () => {
 
   const handleVariantsChange = (newVariants: ThumbnailVariant[]) => {
     setVariants(newVariants);
+  };
 
-    // Mock generation of description and tags when thumbnails are generated
-    if (newVariants.length > 0) {
-      // Generate mock description based on tone and hook text
-      const mockDescriptions = {
-        viral: `🚀 ${hookText || 'This Changed Everything!'}
+  const generateDescriptionAndTags = () => {
+    // Generate mock description based on tone and hook text
+    const mockDescriptions = {
+      viral: `🚀 ${hookText || 'This Changed Everything!'}
 
 What you're about to discover will completely transform how you think about this topic. In this video, I break down the exact strategies that helped me achieve incredible results.
 
 From complete beginner to expert level - here's exactly what worked for me and how you can apply it starting today.
 
 Don't forget to like, subscribe, and hit that notification bell for more game-changing content! 🔥`,
-        curiosity: `❓ ${hookText || 'You Won\'t Believe What I Found'}
+      curiosity: `❓ ${hookText || 'You Won\'t Believe What I Found'}
 
 Have you ever wondered why some people seem to have all the answers? Today, I'm diving deep into a discovery that completely changed my perspective.
 
 What I uncovered might surprise you, but it could be the missing piece you've been looking for. Let's explore this together and see what we can learn.
 
 Share your thoughts in the comments - what's your biggest takeaway from this?`,
-        educational: `📚 ${hookText || 'The Complete Guide You\'ve Been Waiting For'}
+      educational: `📚 ${hookText || 'The Complete Guide You\'ve Been Waiting For'}
 
 Welcome to the most comprehensive guide on this topic. Whether you're just getting started or looking to deepen your knowledge, this video covers everything you need to know.
 
 We'll break down complex concepts into simple, actionable steps that anyone can follow. By the end of this video, you'll have a clear understanding and practical skills you can implement immediately.
 
 If you found this helpful, please give it a thumbs up and consider subscribing for more detailed tutorials!`
-      };
+    };
 
+    if (generationOptions.description) {
       setDescription(mockDescriptions[tone]);
+    }
 
+    if (generationOptions.tags) {
       // Generate mock tags based on content
       const baseTags = ['tutorial', 'guide', 'howto', 'tips', 'education'];
       const toneTags = {
@@ -83,6 +91,10 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
 
   // Generate all metadata (thumbnails, description, tags)
   const canGenerateAll = (() => {
+    // Check if at least one option is selected
+    if (!generationOptions.thumbnails && !generationOptions.description && !generationOptions.tags) {
+      return false;
+    }
     if (!hookText.trim()) return false;
     if (sourceType === THUMBNAIL_SOURCE_TYPES.VIDEO_FRAMES && !hasVideoUploaded) return false;
     if (sourceType === THUMBNAIL_SOURCE_TYPES.IMAGES && (!hasImagesUploaded || assetIds.length === 0)) return false;
@@ -95,25 +107,33 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
     setIsGeneratingAll(true);
 
     try {
-      const response = await generateThumbnails({
-        hookText: hookText.trim(),
-        tone,
-        source: {
-          type: sourceType,
-          assetIds,
-        },
-        count: VALIDATION_RULES.THUMBNAIL_VARIANTS_INITIAL,
-      });
+      // Only generate thumbnails if the option is selected
+      if (generationOptions.thumbnails) {
+        const response = await generateThumbnails({
+          hookText: hookText.trim(),
+          tone,
+          source: {
+            type: sourceType,
+            assetIds,
+          },
+          count: VALIDATION_RULES.THUMBNAIL_VARIANTS_INITIAL,
+        });
 
-      const newVariants = response.variants.slice(0, VALIDATION_RULES.THUMBNAIL_VARIANTS_MAX);
-      handleVariantsChange(newVariants);
+        const newVariants = response.variants.slice(0, VALIDATION_RULES.THUMBNAIL_VARIANTS_MAX);
+        handleVariantsChange(newVariants);
 
-      // Auto-select first variant if none selected
-      if (!selectedVariantId && newVariants.length > 0) {
-        setSelectedVariantId(newVariants[0].id);
+        // Auto-select first variant if none selected
+        if (!selectedVariantId && newVariants.length > 0) {
+          setSelectedVariantId(newVariants[0].id);
+        }
+      }
+
+      // Generate description and tags if selected
+      if (generationOptions.description || generationOptions.tags) {
+        generateDescriptionAndTags();
       }
     } catch (error) {
-      console.error('Failed to generate all metadata:', error);
+      console.error('Failed to generate metadata:', error);
     } finally {
       setIsGeneratingAll(false);
     }
@@ -154,6 +174,8 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
           onGenerate={handleGenerateAll}
           canGenerate={canGenerateAll}
           isGenerating={isGeneratingAll}
+          generationOptions={generationOptions}
+          onGenerationOptionsChange={setGenerationOptions}
         />
       </div>
 

@@ -9,6 +9,12 @@ import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES } from "@/constants/video";
 import { BUTTON_LABELS } from "@/constants/ui";
 import type { SourceType, HookTone, InlineAlert } from "@/lib/types/thumbnails";
 
+export interface GenerationOptions {
+  thumbnails: boolean;
+  description: boolean;
+  tags: boolean;
+}
+
 export interface VideoInputPanelProps {
   onSourceTypeChange?: (sourceType: SourceType) => void;
   onHookTextChange?: (hookText: string) => void;
@@ -19,6 +25,8 @@ export interface VideoInputPanelProps {
   onGenerate?: () => void;
   canGenerate?: boolean;
   isGenerating?: boolean;
+  generationOptions?: GenerationOptions;
+  onGenerationOptionsChange?: (options: GenerationOptions) => void;
 }
 
 export const VideoInputPanel = ({
@@ -31,6 +39,8 @@ export const VideoInputPanel = ({
   onGenerate,
   canGenerate = false,
   isGenerating = false,
+  generationOptions = { thumbnails: true, description: true, tags: true },
+  onGenerationOptionsChange,
 }: VideoInputPanelProps) => {
   const [sourceType, setSourceType] = useState<SourceType>(THUMBNAIL_SOURCE_TYPES.VIDEO_FRAMES);
   const [hookText, setHookText] = useState("");
@@ -87,7 +97,7 @@ export const VideoInputPanel = ({
   return (
     <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)] h-full flex flex-col">
       <CardHeader>
-        <CardTitle id="inputs-heading">Create thumbnails</CardTitle>
+        <CardTitle id="inputs-heading">Generate Metadata</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 space-y-4 pb-0">
         {/* Step 1: Upload file */}
@@ -210,6 +220,64 @@ export const VideoInputPanel = ({
           </div>
         </div>
 
+        {/* Step 4: Select what to generate */}
+        {onGenerationOptionsChange && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
+                4
+              </div>
+              <h3 className="text-sm font-medium text-slate-900">Select what to generate</h3>
+            </div>
+            <div className="pl-9">
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={generationOptions.thumbnails}
+                    onChange={(e) => onGenerationOptionsChange({
+                      ...generationOptions,
+                      thumbnails: e.target.checked,
+                    })}
+                    className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  />
+                  <span className="text-sm font-medium text-slate-900 group-hover:text-slate-700">
+                    Thumbnails
+                  </span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={generationOptions.description}
+                    onChange={(e) => onGenerationOptionsChange({
+                      ...generationOptions,
+                      description: e.target.checked,
+                    })}
+                    className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  />
+                  <span className="text-sm font-medium text-slate-900 group-hover:text-slate-700">
+                    Description
+                  </span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={generationOptions.tags}
+                    onChange={(e) => onGenerationOptionsChange({
+                      ...generationOptions,
+                      tags: e.target.checked,
+                    })}
+                    className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  />
+                  <span className="text-sm font-medium text-slate-900 group-hover:text-slate-700">
+                    Tags
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Generate Button */}
         {onGenerate && (
           <div className="pt-6 border-t border-slate-200">
@@ -219,7 +287,7 @@ export const VideoInputPanel = ({
               size="lg"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
             >
-              {isGenerating ? BUTTON_LABELS.GENERATING_ALL_METADATA : BUTTON_LABELS.GENERATE_THUMBNAILS}
+              {isGenerating ? BUTTON_LABELS.GENERATING_METADATA : BUTTON_LABELS.GENERATE_METADATA}
             </Button>
           </div>
         )}

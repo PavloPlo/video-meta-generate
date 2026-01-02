@@ -1,12 +1,11 @@
 // UI text constants for button labels, messages, and user-facing strings
 export const BUTTON_LABELS = {
-  GENERATE_THUMBNAILS: "Generate thumbnails",
+  GENERATE_METADATA: "Generate metadata",
   ADD_MORE_VARIANTS: "Add more variants",
-  GENERATING_ALL_METADATA: "Generating all metadata...",
+  GENERATING_METADATA: "Generating metadata...",
   GENERATING_MORE_THUMBNAILS: "Generating more thumbnails...",
   GENERATING_MORE_VARIANTS: "Adding more variants...",
   // Mobile-specific buttons
-  GENERATE_METADATA: "Generate Metadata",
   GENERATE_METADATA_DISABLED: "Complete inputs to generate",
   REGENERATE: "Regenerate",
   EDIT_INPUTS: "Edit Inputs",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { VideoInputPanel } from "@/components/molecules/VideoInputPanel";
+import { VideoInputPanel, type GenerationOptions } from "@/components/molecules/VideoInputPanel";
 import { VideoPreviewPanel } from "@/components/molecules/VideoPreviewPanel";
 import { Button } from "@/components/atoms/Button";
 import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES } from "@/constants/video";
@@ -21,6 +21,7 @@ interface MobileSessionState {
     description: string;
     tags: string[];
     lastGeneratedAt?: Date;
+    generationOptions: GenerationOptions;
 }
 
 const STORAGE_KEY = 'mobile_metadata_session';
@@ -39,6 +40,11 @@ export const MobileMetadataForm = () => {
         regenerationCount: 0,
         description: '',
         tags: [],
+        generationOptions: {
+            thumbnails: true,
+            description: true,
+            tags: true,
+        },
     });
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -95,7 +101,17 @@ export const MobileMetadataForm = () => {
         }
     };
 
+    const handleGenerationOptionsChange = (options: GenerationOptions) => {
+        updateSessionState({ generationOptions: options });
+    };
+
     const canGenerate = () => {
+        // Check if at least one option is selected
+        const hasOptionSelected = sessionState.generationOptions.thumbnails || 
+                                   sessionState.generationOptions.description || 
+                                   sessionState.generationOptions.tags;
+        if (!hasOptionSelected) return false;
+        
         const hasAssets = sessionState.hasVideoUploaded || sessionState.hasImagesUploaded;
         const hasTone = !!sessionState.tone;
         const hookTextValid = sessionState.hookText.length <= 200;
@@ -109,37 +125,49 @@ export const MobileMetadataForm = () => {
         try {
             await new Promise(resolve => setTimeout(resolve, 2000));
 
-            const mockVariants: ThumbnailVariant[] = [
-                { id: 'variant-1', imageUrl: '/api/placeholder/thumbnail-1' },
-                { id: 'variant-2', imageUrl: '/api/placeholder/thumbnail-2' },
-            ];
-
-            const mockDescriptions = {
-                viral: `${sessionState.hookText || 'This Changed Everything!'} What you're about to discover will completely transform how you think about this topic.`,
-                curiosity: `${sessionState.hookText || 'You Won\'t Believe What I Found'} Have you ever wondered why some people seem to have all the answers?`,
-                educational: `${sessionState.hookText || 'The Complete Guide You\'ve Been Waiting For'} Welcome to the most comprehensive guide on this topic.`
-            };
-
-            const baseTags = ['tutorial', 'guide', 'howto', 'tips', 'education'];
-            const toneTags = {
-                viral: ['viral', 'trending', 'mustwatch', 'gamechanger', 'lifechanging'],
-                curiosity: ['interesting', 'discovery', 'mystery', 'explained', 'revealed'],
-                educational: ['learn', 'study', 'knowledge', 'skills', 'masterclass']
-            };
-
-            updateSessionState({
-                variants: mockVariants,
-                selectedVariantId: mockVariants[0].id,
-                description: mockDescriptions[sessionState.tone],
-                tags: [...baseTags, ...toneTags[sessionState.tone], '2024', 'new', 'best'],
+            const updates: Partial<MobileSessionState> = {
                 lastGeneratedAt: new Date(),
-            });
+            };
+
+            // Only generate thumbnails if the option is selected
+            if (sessionState.generationOptions.thumbnails) {
+                const mockVariants: ThumbnailVariant[] = [
+                    { id: 'variant-1', imageUrl: '/api/placeholder/thumbnail-1' },
+                    { id: 'variant-2', imageUrl: '/api/placeholder/thumbnail-2' },
+                ];
+                updates.variants = mockVariants;
+                updates.selectedVariantId = mockVariants[0].id;
+            }
+
+            // Only generate description if the option is selected
+            if (sessionState.generationOptions.description) {
+                const mockDescriptions = {
+                    viral: `${sessionState.hookText || 'This Changed Everything!'} What you're about to discover will completely transform how you think about this topic.`,
+                    curiosity: `${sessionState.hookText || 'You Won\'t Believe What I Found'} Have you ever wondered why some people seem to have all the answers?`,
+                    educational: `${sessionState.hookText || 'The Complete Guide You\'ve Been Waiting For'} Welcome to the most comprehensive guide on this topic.`
+                };
+                updates.description = mockDescriptions[sessionState.tone];
+            }
+
+            // Only generate tags if the option is selected
+            if (sessionState.generationOptions.tags) {
+                const baseTags = ['tutorial', 'guide', 'howto', 'tips', 'education'];
+                const toneTags = {
+                    viral: ['viral', 'trending', 'mustwatch', 'gamechanger', 'lifechanging'],
+                    curiosity: ['interesting', 'discovery', 'mystery', 'explained', 'revealed'],
+                    educational: ['learn', 'study', 'knowledge', 'skills', 'masterclass']
+                };
+                updates.tags = [...baseTags, ...toneTags[sessionState.tone], '2024', 'new', 'best'];
+            }
+
+            updateSessionState(updates);
 
             if (typeof window !== 'undefined' && (window as any).gtag) {
                 (window as any).gtag('event', 'mobile_generation_success', {
                     tone: sessionState.tone,
                     source_type: sessionState.sourceType,
                     has_hook_text: sessionState.hookText.length > 0,
+                    generation_options: sessionState.generationOptions,
                 });
             }
 
@@ -204,6 +232,8 @@ export const MobileMetadataForm = () => {
                             onFileUpload={handleFileUpload}
                             hasVideoUploaded={sessionState.hasVideoUploaded}
                             hasImagesUploaded={sessionState.hasImagesUploaded}
+                            generationOptions={sessionState.generationOptions}
+                            onGenerationOptionsChange={handleGenerationOptionsChange}
                         />
                         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 safe-area-inset-bottom">
                             <Button
@@ -213,7 +243,7 @@ export const MobileMetadataForm = () => {
                                 size="lg"
                             >
                                 {isGenerating
-                                    ? BUTTON_LABELS.GENERATING_ALL_METADATA
+                                    ? BUTTON_LABELS.GENERATING_METADATA
                                     : canGenerate()
                                         ? BUTTON_LABELS.GENERATE_METADATA
                                         : BUTTON_LABELS.GENERATE_METADATA_DISABLED
