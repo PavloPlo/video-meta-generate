@@ -58,8 +58,8 @@ describe('HookTextControls', () => {
   it('calls onToneChange when tone is selected', () => {
     render(<HookTextControls {...defaultProps} />);
 
-    const curiosityButton = screen.getByText('Curiosity').closest('button');
-    fireEvent.click(curiosityButton!);
+    const curiosityRadio = screen.getByRole('radio', { name: /curiosity/i });
+    fireEvent.click(curiosityRadio);
 
     expect(defaultProps.onToneChange).toHaveBeenCalledWith(HOOK_TONES.CURIOSITY);
   });
@@ -68,7 +68,10 @@ describe('HookTextControls', () => {
   it('highlights selected tone', () => {
     render(<HookTextControls {...defaultProps} tone={HOOK_TONES.CURIOSITY} />);
 
-    const curiosityButton = screen.getByText('Curiosity').closest('button');
-    expect(curiosityButton).toHaveClass('border-slate-600', 'bg-slate-50');
+    const curiosityRadio = screen.getByRole('radio', { name: /curiosity/i });
+    expect(curiosityRadio).toBeChecked();
+    
+    const curiosityLabel = curiosityRadio.closest('label');
+    expect(curiosityLabel).toHaveClass('border-slate-800', 'bg-slate-50');
   });
 });

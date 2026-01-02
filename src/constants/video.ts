@@ -80,3 +80,27 @@ export const ALERT_SCOPES = {
   GENERATE: 'generate',
   REGENERATE: 'regenerate',
 } as const;
+
+export const TONE_OPTIONS = [
+  {
+    value: 'viral',
+    label: 'Viral',
+    description: 'Attention-grabbing and shareable',
+    icon: '🔥',
+    color: 'text-red-600',
+  },
+  {
+    value: 'curiosity',
+    label: 'Curiosity',
+    description: 'Spark interest and questions',
+    icon: '❓',
+    color: 'text-blue-600',
+  },
+  {
+    value: 'educational',
+    label: 'Educational',
+    description: 'Informative and helpful',
+    icon: '🎓',
+    color: 'text-green-600',
+  },
+] as const;

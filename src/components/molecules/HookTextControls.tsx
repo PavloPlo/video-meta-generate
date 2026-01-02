@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/atoms/Input";
 import { InlineAlert } from "@/components/atoms/InlineAlert";
-import { HOOK_TONES, VALIDATION_RULES } from "@/constants/video";
+import { ToneSelector } from "@/components/atoms/ToneSelector";
+import { VALIDATION_RULES } from "@/constants/video";
 import type { HookTone, InlineAlert as InlineAlertType } from "@/lib/types/thumbnails";
 
 export interface HookTextControlsProps {
@@ -50,30 +51,6 @@ export const HookTextControls = ({
         onToneChange?.(newTone);
     };
 
-    const toneOptions = [
-        {
-            value: HOOK_TONES.VIRAL,
-            label: "Viral",
-            description: "Attention-grabbing and shareable",
-            icon: "🔥",
-            color: "text-red-600"
-        },
-        {
-            value: HOOK_TONES.CURIOSITY,
-            label: "Curiosity",
-            description: "Spark interest and questions",
-            icon: "❓",
-            color: "text-blue-600"
-        },
-        {
-            value: HOOK_TONES.EDUCATIONAL,
-            label: "Educational",
-            description: "Informative and helpful",
-            icon: "🎓",
-            color: "text-green-600"
-        },
-    ];
-
     return (
         <div className={className}>
             <div className="space-y-4">
@@ -115,26 +92,11 @@ export const HookTextControls = ({
                         <label className="text-sm font-medium text-slate-700">
                             Tone
                         </label>
-                        <div className="grid grid-cols-3 gap-3">
-                            {toneOptions.map((option) => (
-                                <button
-                                    key={option.value}
-                                    type="button"
-                                    onClick={() => onToneChange(option.value)}
-                                    className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${tone === option.value
-                                        ? "border-slate-600 bg-slate-50 shadow-sm"
-                                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
-                                        }`}
-                                >
-                                    <div className={`text-2xl mb-2 ${option.color}`}>{option.icon}</div>
-                                    <div className="font-semibold text-slate-900 text-sm">{option.label}</div>
-                                    <div className="text-xs text-slate-500 mt-1 leading-tight">{option.description}</div>
-                                </button>
-                            ))}
-                        </div>
-                        <p className="text-xs text-slate-500">
-                            Used for text style, not content meaning
-                        </p>
+                        <ToneSelector
+                            value={tone}
+                            onChange={handleToneChange}
+                            showHelperText={true}
+                        />
                     </div>
                 )}
 
