@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
 import { ThumbnailVariantsPanel } from "@/components/organisms/ThumbnailVariantsPanel";
 import { InlineAlert as InlineAlertComponent } from "@/components/atoms/InlineAlert";
+import { GENERATION_HELPER } from "@/constants/ui";
 import type { ThumbnailVariant, SourceType, HookTone, InlineAlert as InlineAlertType } from "@/lib/types/thumbnails";
 
 export interface VideoPreviewPanelProps {
@@ -62,19 +63,39 @@ export const VideoPreviewPanel = ({
       setGenerateAlert(null);
     }
   };
+  // Check if nothing has been generated yet
+  const hasNoContent = variants.length === 0 && !description && tags.length === 0;
+
   return (
     <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)] h-full flex flex-col">
       <CardHeader>
         <CardTitle id="preview-heading">Generated Metadata</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
+        {/* Empty state guidance when nothing has been generated */}
+        {hasNoContent && !isGeneratingAll && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-blue-900 mb-1">What happens next?</h4>
+                <p className="text-sm text-blue-800 leading-relaxed">
+                  {GENERATION_HELPER.WHAT_HAPPENS_NEXT}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Thumbnails Section */}
         <div className="space-y-4 mb-6">
-          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
+          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 border-b border-slate-200 pb-2">
+            <span className="text-blue-600">📸</span>
             Thumbnails
           </h3>
-          <div className="pl-10">
+          <div>
             <ThumbnailVariantsPanel
               sourceType={sourceType}
               hookText={hookText}
@@ -95,18 +116,18 @@ export const VideoPreviewPanel = ({
 
         {/* Description Section */}
         <div className="space-y-4 mb-6">
-          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">2</span>
+          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 border-b border-slate-200 pb-2">
+            <span className="text-green-600">📝</span>
             Description
           </h3>
-          <div className="pl-10">
+          <div>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 min-h-[120px] flex flex-col">
               {description ? (
                 <>
                   <div className="prose prose-sm max-w-none flex-1">
                     <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">{description}</p>
                   </div>
-                  <div className="mt-3 flex gap-2 flex-shrink-0">
+                  <div className="mt-3 flex gap-2 shrink-0">
                     <button className="text-xs px-3 py-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300 transition-colors">
                       Copy
                     </button>
@@ -124,7 +145,10 @@ export const VideoPreviewPanel = ({
                         Generating description...
                       </div>
                     ) : (
-                      <p>Description will appear here after generation</p>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-slate-600">Your optimized description will appear here</p>
+                        <p className="text-xs text-slate-500">Complete the requirements and click Generate</p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -135,11 +159,11 @@ export const VideoPreviewPanel = ({
 
         {/* Tags Section */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-bold">3</span>
+          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2 border-b border-slate-200 pb-2">
+            <span className="text-purple-600">🏷️</span>
             Tags
           </h3>
-          <div className="pl-10">
+          <div>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 min-h-[120px] flex flex-col">
               {tags.length > 0 ? (
                 <>
@@ -153,7 +177,7 @@ export const VideoPreviewPanel = ({
                       </span>
                     ))}
                   </div>
-                  <div className="mt-3 flex gap-2 flex-shrink-0">
+                  <div className="mt-3 flex gap-2 shrink-0">
                     <button className="text-xs px-3 py-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300 transition-colors">
                       Copy All
                     </button>
@@ -171,7 +195,10 @@ export const VideoPreviewPanel = ({
                         Generating tags...
                       </div>
                     ) : (
-                      <p>Tags will appear here after generation</p>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-slate-600">Your optimized tags will appear here</p>
+                        <p className="text-xs text-slate-500">Complete the requirements and click Generate</p>
+                      </div>
                     )}
                   </div>
                 </div>

@@ -6,7 +6,7 @@ import { Button } from "@/components/atoms/Button";
 import { HookTextControls } from "@/components/molecules/HookTextControls";
 import { InlineAlert as InlineAlertComponent } from "@/components/atoms/InlineAlert";
 import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES } from "@/constants/video";
-import { BUTTON_LABELS } from "@/constants/ui";
+import { BUTTON_LABELS, GENERATION_HELPER, CHECKLIST_LABELS } from "@/constants/ui";
 import type { SourceType, HookTone, InlineAlert } from "@/lib/types/thumbnails";
 
 export interface GenerationOptions {
@@ -278,17 +278,104 @@ export const VideoInputPanel = ({
           </div>
         )}
 
-        {/* Generate Button */}
+        {/* Checklist and Generate Button */}
         {onGenerate && (
-          <div className="pt-6 border-t border-slate-200">
-            <Button
-              onClick={onGenerate}
-              disabled={!canGenerate || isGenerating}
-              size="lg"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
-            >
-              {isGenerating ? BUTTON_LABELS.GENERATING_METADATA : BUTTON_LABELS.GENERATE_METADATA}
-            </Button>
+          <div className="pt-6 border-t border-slate-200 space-y-4">
+            {/* Requirements Checklist */}
+            <div className="space-y-2.5">
+              <h4 className="text-xs font-medium text-slate-600 uppercase tracking-wider">Requirements</h4>
+              <div className="space-y-2">
+                {/* File uploaded - Required */}
+                <div className="flex items-center gap-2">
+                  <div className={`flex items-center justify-center w-5 h-5 rounded border-2 transition-colors ${
+                    hasVideoUploaded || hasImagesUploaded 
+                      ? 'bg-green-500 border-green-500' 
+                      : 'border-slate-300 bg-white'
+                  }`}>
+                    {(hasVideoUploaded || hasImagesUploaded) && (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className={`text-sm ${
+                    hasVideoUploaded || hasImagesUploaded 
+                      ? 'text-slate-700 font-medium' 
+                      : 'text-slate-500'
+                  }`}>
+                    {CHECKLIST_LABELS.FILE_UPLOADED}
+                    <span className="ml-1.5 text-xs font-semibold text-red-600">*</span>
+                  </span>
+                </div>
+
+                {/* Hook text - Optional */}
+                <div className="flex items-center gap-2">
+                  <div className={`flex items-center justify-center w-5 h-5 rounded border-2 transition-colors ${
+                    hookText.trim() 
+                      ? 'bg-green-500 border-green-500' 
+                      : 'border-slate-300 bg-white'
+                  }`}>
+                    {hookText.trim() && (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className={`text-sm ${
+                    hookText.trim() 
+                      ? 'text-slate-700 font-medium' 
+                      : 'text-slate-500'
+                  }`}>
+                    {CHECKLIST_LABELS.HOOK_TEXT}
+                    <span className="ml-1.5 text-xs text-slate-400">(optional)</span>
+                  </span>
+                </div>
+
+                {/* Tone selected - Optional */}
+                <div className="flex items-center gap-2">
+                  <div className={`flex items-center justify-center w-5 h-5 rounded border-2 transition-colors ${
+                    tone 
+                      ? 'bg-green-500 border-green-500' 
+                      : 'border-slate-300 bg-white'
+                  }`}>
+                    {tone && (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className={`text-sm ${
+                    tone 
+                      ? 'text-slate-700 font-medium' 
+                      : 'text-slate-500'
+                  }`}>
+                    {CHECKLIST_LABELS.TONE_SELECTED}
+                    <span className="ml-1.5 text-xs text-slate-400">(optional)</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Generate Button */}
+            <div className="relative group">
+              <Button
+                onClick={onGenerate}
+                disabled={!canGenerate || isGenerating}
+                size="lg"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-lg transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
+              >
+                {isGenerating ? BUTTON_LABELS.GENERATING_METADATA : BUTTON_LABELS.GENERATE_METADATA}
+              </Button>
+              {/* Helper text when disabled */}
+              {!canGenerate && !isGenerating && (
+                <div className="mt-2 text-xs text-slate-500 text-center flex items-center justify-center gap-1.5">
+                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {GENERATION_HELPER.UPLOAD_FILE_TO_CONTINUE}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

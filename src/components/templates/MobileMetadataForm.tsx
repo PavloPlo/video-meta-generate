@@ -112,10 +112,10 @@ export const MobileMetadataForm = () => {
                                    sessionState.generationOptions.tags;
         if (!hasOptionSelected) return false;
         
+        // Only require file upload - hookText and tone are optional but hookText has length validation
         const hasAssets = sessionState.hasVideoUploaded || sessionState.hasImagesUploaded;
-        const hasTone = !!sessionState.tone;
         const hookTextValid = sessionState.hookText.length <= 200;
-        return hasAssets && hasTone && hookTextValid;
+        return hasAssets && hookTextValid;
     };
 
     const handleGenerate = async () => {

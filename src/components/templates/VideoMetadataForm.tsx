@@ -95,7 +95,7 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
     if (!generationOptions.thumbnails && !generationOptions.description && !generationOptions.tags) {
       return false;
     }
-    if (!hookText.trim()) return false;
+    // Only require file upload - hookText is optional
     if (sourceType === THUMBNAIL_SOURCE_TYPES.VIDEO_FRAMES && !hasVideoUploaded) return false;
     if (sourceType === THUMBNAIL_SOURCE_TYPES.IMAGES && (!hasImagesUploaded || assetIds.length === 0)) return false;
     return true;

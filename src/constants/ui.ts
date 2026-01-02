@@ -40,3 +40,16 @@ export const ALERT_MESSAGES = {
   METADATA_GENERATED_SUCCESS: "Metadata generated successfully!",
   METADATA_GENERATION_FAILED: "Failed to generate metadata",
 } as const;
+
+// Helper text for generation requirements
+export const GENERATION_HELPER = {
+  UPLOAD_FILE_TO_CONTINUE: "Upload a video or images to continue",
+  WHAT_HAPPENS_NEXT: "Upload your video or images, add optional hook text and tone preferences, then generate your metadata. We'll create thumbnails, descriptions, and tags optimized for YouTube.",
+} as const;
+
+// Checklist labels
+export const CHECKLIST_LABELS = {
+  FILE_UPLOADED: "File uploaded",
+  HOOK_TEXT: "Hook text",
+  TONE_SELECTED: "Tone selected",
+} as const;
