@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { ResponsiveMetadataForm } from "@/components/templates/ResponsiveMetadataForm";
 
-export default async function CreateYoutubeMetainformationPage() {
+export default async function CreateYoutubeMetadataPage() {
   // Check for session cookie (middleware also checks, but this is a backup)
   // Full database session validation is handled separately
   // const cookieStore = await cookies();
@@ -25,7 +25,7 @@ export default async function CreateYoutubeMetainformationPage() {
       aria-label="YouTube metadata generation"
     >
       <h1 className="text-2xl font-semibold text-slate-950 sm:text-3xl">
-        Create metainformation for your YouTube video
+        Create YouTube thumbnails and metadata
       </h1>
 
       <ResponsiveMetadataForm />
