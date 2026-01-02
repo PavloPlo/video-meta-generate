@@ -72,7 +72,7 @@ export const SourceSelector = ({
                 onClick={() => onChange(option.value)}
                 className={cn(
                   "relative flex flex-col items-start rounded-xl border-2 p-4 text-left transition-all duration-200",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
                   isSelected
                     ? "border-slate-600 bg-slate-50 shadow-sm"
                     : needsAssets

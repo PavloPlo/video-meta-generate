@@ -158,7 +158,7 @@ export const VideoInputPanel = ({
                   key={option.value}
                   type="button"
                   onClick={() => handleToneChange(option.value)}
-                  className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 ${tone === option.value
+                  className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${tone === option.value
                       ? "border-slate-600 bg-slate-50 shadow-sm"
                       : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
                     }`}

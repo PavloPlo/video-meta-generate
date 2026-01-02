@@ -38,11 +38,21 @@ export const ThumbnailVariantCard = ({
       <div
         className={cn(
           "relative aspect-video rounded-lg overflow-hidden border-4 transition-all cursor-pointer",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
           isSelected
             ? "border-blue-600 ring-4 ring-blue-500/30 shadow-lg"
             : "border-slate-200 hover:border-slate-300"
         )}
         onClick={onSelect}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onSelect();
+          }
+        }}
+        tabIndex={0}
+        role="button"
+        aria-label={`Select thumbnail variant ${variant.id}${isSelected ? ' (currently selected)' : ''}`}
       >
         <Image
           src={variant.imageUrl}
