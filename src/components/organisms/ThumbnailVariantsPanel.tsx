@@ -161,60 +161,77 @@ export const ThumbnailVariantsPanel = ({
   };
 
   return (
-    <div className={className}>
-      {/* Controls */}
-      <div className="flex gap-3 mb-6">
+    <div className={`flex flex-col ${className}`}>
+      {/* Controls - Primary CTA Hierarchy */}
+      <div className="space-y-3 mb-6">
+        {/* Primary: Generate */}
         <Button
           onClick={handleGenerate}
           disabled={!canGenerate || isGenerating}
-          className="flex-1"
+          size="lg"
+          className="w-full"
         >
-          {isGenerating ? "Generating..." : "Generate"}
+          {isGenerating ? "Generating thumbnails..." : "Generate thumbnails"}
         </Button>
 
-        <Button
-          onClick={handleRegenerate}
-          disabled={!canRegenerate || isRegenerating || !canGenerate}
-          variant="outline"
-          className="flex-1"
-        >
-          {isRegenerating ? "Adding..." : "Regenerate"}
-        </Button>
+        {/* Secondary: Regenerate - visually de-emphasized until variants exist */}
+        {variants.length > 0 && (
+          <Button
+            onClick={handleRegenerate}
+            disabled={!canRegenerate || isRegenerating || !canGenerate}
+            variant="outline"
+            className="w-full opacity-75 hover:opacity-100 transition-opacity"
+          >
+            {isRegenerating ? "Adding more thumbnails..." : "Add more thumbnails"}
+          </Button>
+        )}
       </div>
 
-      {/* Variants Grid */}
-      {variants.length > 0 && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {variants.map((variant) => (
-              <ThumbnailVariantCard
-                key={variant.id}
-                variant={variant}
-                isSelected={selectedVariantId === variant.id}
-                onSelect={() => handleVariantSelect(variant.id)}
+      {/* Variants Grid - takes remaining height */}
+      <div className="flex-1 min-h-0">
+        {variants.length > 0 && (
+          <div className="space-y-4 h-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
+              {variants.map((variant) => (
+                <ThumbnailVariantCard
+                  key={variant.id}
+                  variant={variant}
+                  isSelected={selectedVariantId === variant.id}
+                  onSelect={() => handleVariantSelect(variant.id)}
+                />
+              ))}
+            </div>
+
+            {/* Limit Reached Message */}
+            {variants.length >= VALIDATION_RULES.THUMBNAIL_VARIANTS_MAX && (
+              <InlineAlert
+                scope={ALERT_SCOPES.REGENERATE}
+                kind={ALERT_KINDS.WARNING}
+                message="Maximum of 6 thumbnails reached. Choose one to continue."
               />
+            )}
+          </div>
+        )}
+
+        {/* Loading Skeletons */}
+        {(isGenerating || isRegenerating) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
+            {Array.from({ length: isGenerating ? VALIDATION_RULES.THUMBNAIL_VARIANTS_INITIAL : VALIDATION_RULES.THUMBNAIL_VARIANTS_REGENERATE }).map((_, i) => (
+              <div key={i} className="aspect-video rounded-lg bg-slate-200 animate-pulse" />
             ))}
           </div>
+        )}
 
-          {/* Limit Reached Message */}
-          {variants.length >= VALIDATION_RULES.THUMBNAIL_VARIANTS_MAX && (
-            <InlineAlert
-              scope={ALERT_SCOPES.REGENERATE}
-              kind={ALERT_KINDS.WARNING}
-              message="Maximum of 6 thumbnails reached. Choose one to continue."
-            />
-          )}
-        </div>
-      )}
-
-      {/* Loading Skeletons */}
-      {(isGenerating || isRegenerating) && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          {Array.from({ length: isGenerating ? VALIDATION_RULES.THUMBNAIL_VARIANTS_INITIAL : VALIDATION_RULES.THUMBNAIL_VARIANTS_REGENERATE }).map((_, i) => (
-            <div key={i} className="aspect-video rounded-lg bg-slate-200 animate-pulse" />
-          ))}
-        </div>
-      )}
+        {/* Empty state hint */}
+        {variants.length === 0 && !isGenerating && (
+          <div className="flex items-center justify-center h-full text-center">
+            <div className="text-slate-500">
+              <p className="text-lg font-medium mb-2">Ready to generate thumbnails</p>
+              <p className="text-sm">Complete the steps on the left, then click &ldquo;Generate thumbnails&rdquo;</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

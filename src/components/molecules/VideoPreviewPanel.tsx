@@ -32,11 +32,11 @@ export const VideoPreviewPanel = ({
   assetIds = [],
 }: VideoPreviewPanelProps) => {
   return (
-    <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)]">
+    <Card className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.4)] h-full flex flex-col">
       <CardHeader>
         <CardTitle id="preview-heading">Thumbnail Variants</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         <ThumbnailVariantsPanel
           sourceType={sourceType}
           hookText={hookText}
@@ -49,6 +49,7 @@ export const VideoPreviewPanel = ({
           hasVideoUploaded={hasVideoUploaded}
           hasImagesUploaded={hasImagesUploaded}
           assetIds={assetIds}
+          className="h-full"
         />
       </CardContent>
     </Card>

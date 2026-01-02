@@ -25,11 +25,11 @@ describe('SourceSelector', () => {
     render(<SourceSelector {...defaultProps} />);
 
     const videoFramesButton = screen.getByText('Video frames').closest('button');
-    expect(videoFramesButton).toHaveClass('border-slate-500');
+    expect(videoFramesButton).toHaveClass('border-slate-600');
   });
 
   it('calls onChange when option is clicked', () => {
-    render(<SourceSelector {...defaultProps} />);
+    render(<SourceSelector {...defaultProps} hasVideoUploaded={true} hasImagesUploaded={true} />);
 
     const imagesButton = screen.getByText('Uploaded images').closest('button');
     fireEvent.click(imagesButton!);

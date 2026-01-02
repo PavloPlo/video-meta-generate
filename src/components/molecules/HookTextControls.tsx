@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/atoms/Input";
 import { InlineAlert } from "@/components/atoms/InlineAlert";
 import { HOOK_TONES, VALIDATION_RULES } from "@/constants/video";
@@ -25,6 +25,23 @@ export const HookTextControls = ({
 }: HookTextControlsProps) => {
     const [localHookText, setLocalHookText] = useState(hookText);
 
+    // Rotating placeholders
+    const placeholders = [
+        "This Changed Everything",
+        "I Wish I Knew This Earlier",
+        "You Won't Believe What Happened",
+        "The Secret They Don't Want You To Know"
+    ];
+    const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+        }, 3000); // Rotate every 3 seconds
+
+        return () => clearInterval(interval);
+    }, [placeholders.length]);
+
     const handleHookTextChange = (value: string) => {
         const truncatedValue = value.slice(0, VALIDATION_RULES.HOOK_TEXT_MAX_LENGTH);
         setLocalHookText(truncatedValue);
@@ -36,9 +53,27 @@ export const HookTextControls = ({
     };
 
     const toneOptions = [
-        { value: HOOK_TONES.VIRAL, label: "Viral", description: "Attention-grabbing and shareable" },
-        { value: HOOK_TONES.CURIOSITY, label: "Curiosity", description: "Spark interest and questions" },
-        { value: HOOK_TONES.EDUCATIONAL, label: "Educational", description: "Informative and helpful" },
+        {
+            value: HOOK_TONES.VIRAL,
+            label: "Viral",
+            description: "Attention-grabbing and shareable",
+            icon: "🔥",
+            color: "text-red-600"
+        },
+        {
+            value: HOOK_TONES.CURIOSITY,
+            label: "Curiosity",
+            description: "Spark interest and questions",
+            icon: "❓",
+            color: "text-blue-600"
+        },
+        {
+            value: HOOK_TONES.EDUCATIONAL,
+            label: "Educational",
+            description: "Informative and helpful",
+            icon: "🎓",
+            color: "text-green-600"
+        },
     ];
 
     return (
@@ -52,37 +87,47 @@ export const HookTextControls = ({
                     <Input
                         id="hook-text"
                         type="text"
-                        placeholder="Enter your hook text..."
+                        placeholder={placeholders[currentPlaceholderIndex]}
                         value={localHookText}
                         onChange={(e) => handleHookTextChange(e.target.value)}
                         maxLength={VALIDATION_RULES.HOOK_TEXT_MAX_LENGTH}
+                        className="transition-all duration-300"
                     />
-                    <p className="text-xs text-slate-500">
-                        {localHookText.length}/{VALIDATION_RULES.HOOK_TEXT_MAX_LENGTH} characters
-                    </p>
+                    <div className="flex justify-between items-center">
+                        <p className="text-xs text-slate-500">
+                            Recommended: under 6 words
+                        </p>
+                        <p className="text-xs text-slate-500 tabular-nums">
+                            {localHookText.length}/{VALIDATION_RULES.HOOK_TEXT_MAX_LENGTH}
+                        </p>
+                    </div>
                 </div>
 
                 {/* Tone Selector */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                     <label className="text-sm font-medium text-slate-700">
                         Tone
                     </label>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-3 gap-3">
                         {toneOptions.map((option) => (
                             <button
                                 key={option.value}
                                 type="button"
                                 onClick={() => handleToneChange(option.value)}
-                                className={`flex-1 rounded-lg border p-3 text-left text-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 ${tone === option.value
-                                        ? "border-slate-500 bg-slate-50"
-                                        : "border-slate-200"
+                                className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 ${tone === option.value
+                                        ? "border-slate-600 bg-slate-50 shadow-sm"
+                                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
                                     }`}
                             >
-                                <div className="font-medium text-slate-900">{option.label}</div>
-                                <div className="text-xs text-slate-500 mt-1">{option.description}</div>
+                                <div className={`text-2xl mb-2 ${option.color}`}>{option.icon}</div>
+                                <div className="font-semibold text-slate-900 text-sm">{option.label}</div>
+                                <div className="text-xs text-slate-500 mt-1 leading-tight">{option.description}</div>
                             </button>
                         ))}
                     </div>
+                    <p className="text-xs text-slate-500">
+                        Used for text style, not content meaning
+                    </p>
                 </div>
 
                 {/* Inline Alert */}

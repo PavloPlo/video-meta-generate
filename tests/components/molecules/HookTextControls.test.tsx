@@ -51,7 +51,7 @@ describe('HookTextControls', () => {
   it('shows character count', () => {
     render(<HookTextControls {...defaultProps} hookText="Test text" />);
 
-    expect(screen.getByText('9/200 characters')).toBeInTheDocument();
+    expect(screen.getByText('9/200')).toBeInTheDocument();
   });
 
   it('calls onToneChange when tone is selected', () => {
@@ -79,6 +79,6 @@ describe('HookTextControls', () => {
     render(<HookTextControls {...defaultProps} tone={HOOK_TONES.CURIOSITY} />);
 
     const curiosityButton = screen.getByText('Curiosity').closest('button');
-    expect(curiosityButton).toHaveClass('border-slate-500', 'bg-slate-50');
+    expect(curiosityButton).toHaveClass('border-slate-600', 'bg-slate-50');
   });
 });

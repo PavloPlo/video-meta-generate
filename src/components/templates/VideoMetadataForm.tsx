@@ -56,29 +56,33 @@ export const VideoMetadataForm = () => {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <VideoInputPanel
-        onSourceTypeChange={handleSourceTypeChange}
-        onHookTextChange={handleHookTextChange}
-        onToneChange={handleToneChange}
-        onInlineAlert={handleInlineAlert}
-        hasVideoUploaded={hasVideoUploaded}
-        hasImagesUploaded={hasImagesUploaded}
-      />
+    <div className="grid gap-6 lg:grid-cols-2 min-h-[600px]">
+      <div className="min-h-[600px]">
+        <VideoInputPanel
+          onSourceTypeChange={handleSourceTypeChange}
+          onHookTextChange={handleHookTextChange}
+          onToneChange={handleToneChange}
+          onInlineAlert={handleInlineAlert}
+          hasVideoUploaded={hasVideoUploaded}
+          hasImagesUploaded={hasImagesUploaded}
+        />
+      </div>
 
-      <VideoPreviewPanel
-        sourceType={sourceType}
-        hookText={hookText}
-        tone={tone}
-        variants={variants}
-        selectedVariantId={selectedVariantId}
-        onVariantsChange={handleVariantsChange}
-        onSelectedVariantChange={handleSelectedVariantChange}
-        onInlineAlert={handleInlineAlert}
-        hasVideoUploaded={hasVideoUploaded}
-        hasImagesUploaded={hasImagesUploaded}
-        assetIds={assetIds}
-      />
+      <div className="min-h-[600px]">
+        <VideoPreviewPanel
+          sourceType={sourceType}
+          hookText={hookText}
+          tone={tone}
+          variants={variants}
+          selectedVariantId={selectedVariantId}
+          onVariantsChange={handleVariantsChange}
+          onSelectedVariantChange={handleSelectedVariantChange}
+          onInlineAlert={handleInlineAlert}
+          hasVideoUploaded={hasVideoUploaded}
+          hasImagesUploaded={hasImagesUploaded}
+          assetIds={assetIds}
+        />
+      </div>
 
       {/* Development helpers - remove in production */}
       <div className="lg:col-span-2 mt-8 p-4 bg-slate-50 rounded-lg">
