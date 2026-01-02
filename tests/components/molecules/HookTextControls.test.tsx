@@ -63,17 +63,6 @@ describe('HookTextControls', () => {
     expect(defaultProps.onToneChange).toHaveBeenCalledWith(HOOK_TONES.CURIOSITY);
   });
 
-  it('shows inline alert when provided', () => {
-    const alert = {
-      scope: 'controls' as const,
-      kind: 'info' as const,
-      message: 'Tone changed',
-    };
-
-    render(<HookTextControls {...defaultProps} inlineAlert={alert} />);
-
-    expect(screen.getByText('Tone changed')).toBeInTheDocument();
-  });
 
   it('highlights selected tone', () => {
     render(<HookTextControls {...defaultProps} tone={HOOK_TONES.CURIOSITY} />);

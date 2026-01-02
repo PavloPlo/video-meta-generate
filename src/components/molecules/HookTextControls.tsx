@@ -9,8 +9,6 @@ export interface HookTextControlsProps {
     onHookTextChange: (value: string) => void;
     tone: HookTone;
     onToneChange: (value: HookTone) => void;
-    inlineAlert?: InlineAlertType | null;
-    onAlertDismiss?: () => void;
     className?: string;
 }
 
@@ -19,8 +17,6 @@ export const HookTextControls = ({
     onHookTextChange,
     tone,
     onToneChange,
-    inlineAlert,
-    onAlertDismiss,
     className,
 }: HookTextControlsProps) => {
     const [localHookText, setLocalHookText] = useState(hookText);
@@ -115,8 +111,8 @@ export const HookTextControls = ({
                                 type="button"
                                 onClick={() => handleToneChange(option.value)}
                                 className={`flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 ${tone === option.value
-                                        ? "border-slate-600 bg-slate-50 shadow-sm"
-                                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
+                                    ? "border-slate-600 bg-slate-50 shadow-sm"
+                                    : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-25"
                                     }`}
                             >
                                 <div className={`text-2xl mb-2 ${option.color}`}>{option.icon}</div>
@@ -130,14 +126,6 @@ export const HookTextControls = ({
                     </p>
                 </div>
 
-                {/* Inline Alert */}
-                {inlineAlert && inlineAlert.scope === 'controls' && (
-                    <InlineAlert
-                        scope={inlineAlert.scope}
-                        kind={inlineAlert.kind}
-                        message={inlineAlert.message}
-                    />
-                )}
             </div>
         </div>
     );

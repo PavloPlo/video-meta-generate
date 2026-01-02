@@ -37,28 +37,37 @@ describe('SourceSelector', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith(THUMBNAIL_SOURCE_TYPES.IMAGES);
   });
 
-  it('shows validation message for video frames when no video uploaded', () => {
-    render(<SourceSelector {...defaultProps} />);
+  it('calls onValidationChange with validation message for video frames when no video uploaded', () => {
+    const mockOnValidationChange = jest.fn();
+    render(<SourceSelector {...defaultProps} onValidationChange={mockOnValidationChange} />);
 
-    expect(screen.getByText('Upload a video first to use video frames')).toBeInTheDocument();
+    expect(mockOnValidationChange).toHaveBeenCalledWith('Upload a video first to use video frames');
   });
 
-  it('shows validation message for images when no images uploaded', () => {
-    render(<SourceSelector {...defaultProps} value={THUMBNAIL_SOURCE_TYPES.IMAGES} />);
+  it('calls onValidationChange with validation message for images when no images uploaded', () => {
+    const mockOnValidationChange = jest.fn();
+    render(
+      <SourceSelector
+        {...defaultProps}
+        value={THUMBNAIL_SOURCE_TYPES.IMAGES}
+        onValidationChange={mockOnValidationChange}
+      />
+    );
 
-    expect(screen.getByText('Upload at least one image first')).toBeInTheDocument();
+    expect(mockOnValidationChange).toHaveBeenCalledWith('Upload at least one image first');
   });
 
-  it('does not show validation message when assets are available', () => {
+  it('calls onValidationChange with null when assets are available', () => {
+    const mockOnValidationChange = jest.fn();
     render(
       <SourceSelector
         {...defaultProps}
         hasVideoUploaded={true}
         hasImagesUploaded={true}
+        onValidationChange={mockOnValidationChange}
       />
     );
 
-    expect(screen.queryByText('Upload a video first')).not.toBeInTheDocument();
-    expect(screen.queryByText('Upload at least one image first')).not.toBeInTheDocument();
+    expect(mockOnValidationChange).toHaveBeenCalledWith(null);
   });
 });

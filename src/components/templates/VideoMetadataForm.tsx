@@ -13,7 +13,6 @@ export const VideoMetadataForm = () => {
   const [tone, setTone] = useState<HookTone>(HOOK_TONES.VIRAL);
   const [variants, setVariants] = useState<ThumbnailVariant[]>([]);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
-  const [inlineAlert, setInlineAlert] = useState<InlineAlert | null>(null);
 
   // Asset upload state (mocked for now - would be connected to actual upload system)
   const [hasVideoUploaded, setHasVideoUploaded] = useState(false);
@@ -40,9 +39,6 @@ export const VideoMetadataForm = () => {
     setSelectedVariantId(variantId);
   };
 
-  const handleInlineAlert = (alert: InlineAlert | null) => {
-    setInlineAlert(alert);
-  };
 
   // Mock functions for asset upload (would be connected to actual upload system)
   const handleVideoUpload = () => {
@@ -62,7 +58,13 @@ export const VideoMetadataForm = () => {
           onSourceTypeChange={handleSourceTypeChange}
           onHookTextChange={handleHookTextChange}
           onToneChange={handleToneChange}
-          onInlineAlert={handleInlineAlert}
+          onFileUpload={(type) => {
+            if (type === 'video') {
+              handleVideoUpload();
+            } else if (type === 'images') {
+              handleImagesUpload();
+            }
+          }}
           hasVideoUploaded={hasVideoUploaded}
           hasImagesUploaded={hasImagesUploaded}
         />
@@ -77,7 +79,6 @@ export const VideoMetadataForm = () => {
           selectedVariantId={selectedVariantId}
           onVariantsChange={handleVariantsChange}
           onSelectedVariantChange={handleSelectedVariantChange}
-          onInlineAlert={handleInlineAlert}
           hasVideoUploaded={hasVideoUploaded}
           hasImagesUploaded={hasImagesUploaded}
           assetIds={assetIds}
@@ -86,22 +87,7 @@ export const VideoMetadataForm = () => {
 
       {/* Development helpers - remove in production */}
       <div className="lg:col-span-2 mt-8 p-4 bg-slate-50 rounded-lg">
-        <h3 className="text-sm font-medium text-slate-700 mb-2">Development Controls</h3>
-        <div className="flex gap-4">
-          <button
-            onClick={handleVideoUpload}
-            className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
-          >
-            Mock Video Upload
-          </button>
-          <button
-            onClick={handleImagesUpload}
-            className="px-3 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600"
-          >
-            Mock Images Upload
-          </button>
-        </div>
-        <div className="mt-2 text-xs text-slate-500">
+        <div className="text-xs text-slate-500">
           Source: {sourceType} | Hook: &ldquo;{hookText}&rdquo; | Tone: {tone} | Variants: {variants.length} | Selected: {selectedVariantId || 'none'}
         </div>
       </div>

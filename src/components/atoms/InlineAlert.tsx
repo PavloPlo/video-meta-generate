@@ -5,6 +5,7 @@ export interface InlineAlertProps {
   scope: AlertScope;
   kind: AlertKind;
   message: string;
+  isVisible?: boolean;
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export const InlineAlert = ({
   scope,
   kind,
   message,
+  isVisible = true,
   className,
 }: InlineAlertProps) => {
   const isError = kind === "error";
@@ -30,8 +32,9 @@ export const InlineAlert = ({
       role={role}
       aria-live={ariaLive}
       className={cn(
-        "rounded-md border p-3 text-sm",
+        "h-10 flex items-center rounded-md border px-3 text-sm transition-opacity duration-200",
         alertStyles[kind],
+        isVisible ? "opacity-100" : "opacity-0 pointer-events-none",
         className
       )}
     >
