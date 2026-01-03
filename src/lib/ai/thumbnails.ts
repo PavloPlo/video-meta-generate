@@ -93,9 +93,10 @@ export async function generateThumbnailImages(
       style: tone === "viral" ? "vivid" : "natural",
     });
 
-    const imageUrl = response.data[0]?.url;
+    const imageUrl = (response as any).data?.[0]?.url;
     if (!imageUrl) {
-      throw new Error(`Failed to generate thumbnail ${index + 1}`);
+      console.error('OpenAI response:', response);
+      throw new Error(`Failed to generate thumbnail ${index + 1}: No image URL in response`);
     }
 
     return {

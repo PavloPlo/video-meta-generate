@@ -24,7 +24,7 @@ const EnvSchema = z.object({
   STORAGE_FORCE_PATH_STYLE: z
     .string()
     .transform((val) => val === "true")
-    .default("false"),
+    .default(false),
 
   // AI Provider Configuration
   AI_PROVIDER: z.enum(["openai", "anthropic"]).default("openai"),

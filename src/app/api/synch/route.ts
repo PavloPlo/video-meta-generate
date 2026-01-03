@@ -13,7 +13,7 @@ const GA4EventSchema = z.object({
   clientId: z.string().min(1, 'Client ID is required'),
   events: z.array(z.object({
     name: z.string().min(1).max(40, 'Event name too long'),
-    params: z.record(z.unknown()).optional(),
+    params: z.record(z.string(), z.unknown()).optional(),
   })).min(1, 'At least one event required'),
   userId: z.string().optional(),
 });
@@ -52,12 +52,12 @@ export async function POST(request: NextRequest) {
       body = GA4EventSchema.parse(rawBody);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error('[GA4] Validation error:', error.errors);
+        console.error('[GA4] Validation error:', error.issues);
         return NextResponse.json(
           {
             success: false,
             error: 'Invalid request data',
-            details: error.errors
+            details: error.issues
           },
           { status: 400 }
         );

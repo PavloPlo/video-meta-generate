@@ -98,7 +98,6 @@ Generate a complete, ready-to-use YouTube description. Remember: no markdown for
     model: provider(AI_MODELS.text),
     system: systemPrompt,
     prompt: userPrompt,
-    maxTokens: 1500,
     temperature: 0.7,
   });
 
@@ -168,7 +167,6 @@ Output format: tag1, tag2, tag3, ... (comma-separated, no numbering, no explanat
     model: provider(AI_MODELS.text),
     system: systemPrompt,
     prompt: userPrompt,
-    maxTokens: 500,
     temperature: 0.6,
   });
 
