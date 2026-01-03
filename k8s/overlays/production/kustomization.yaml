@@ -21,10 +21,10 @@ labels:
       database: managed
       storage: cloud
 
-# Images with production-specific tags
-images:
-  - name: ghcr.io/video-meta-generate
-    newTag: prod-latest
+# Images will be overridden by workflow
+# images:
+#   - name: ghcr.io/video-meta-generate
+#     newTag: prod-latest
 
 # Resources that are production-specific
 resources:

@@ -21,10 +21,10 @@ labels:
       environment: staging
       app.kubernetes.io/environment: staging
 
-# Images with staging-specific tags
-images:
-  - name: ghcr.io/video-meta-generate
-    newTag: staging-latest
+# Images will be overridden by workflow
+# images:
+#   - name: ghcr.io/video-meta-generate
+#     newTag: staging-latest
 
 # Resources that are staging-specific
 resources:

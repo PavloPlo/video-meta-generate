@@ -65,8 +65,8 @@ jobs:
         run: |
           cd k8s/overlays/production
 
-          # Update image tag using kubectl kustomize
-          kubectl kustomize . | sed "s|ghcr.io/${{ github.repository }}:latest|${{ needs.build-and-push.outputs.image }}|g" > /tmp/manifests.yaml
+          # Generate manifests with image override
+          kubectl kustomize . --image=ghcr.io/${{ github.repository }}=${{ needs.build-and-push.outputs.image }} > /tmp/manifests.yaml
 
           # Create application secrets
           kubectl create secret generic app-secrets \
