@@ -18,7 +18,8 @@ export function getAIProvider() {
       }
       return createOpenAI({
         apiKey: env.OPENAI_API_KEY,
-        baseURL: env.OPENAI_BASE_URL,
+        // Only include baseURL if it's defined to avoid SDK errors with undefined
+        ...(env.OPENAI_BASE_URL && { baseURL: env.OPENAI_BASE_URL }),
       });
     case "anthropic":
       // Anthropic support can be added later

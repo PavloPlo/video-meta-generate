@@ -8,7 +8,7 @@ import { ToneSelector } from "@/components/atoms/ToneSelector";
 import { InlineAlert as InlineAlertComponent } from "@/components/atoms/InlineAlert";
 import { FileUploadSummary, type UploadedFileInfo } from "@/components/atoms/FileUploadSummary";
 import { UploadProgress, type UploadStage } from "@/components/atoms/UploadProgress";
-import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES, UPLOAD_CONSTRAINTS, SUPPORTED_VIDEO_FORMATS, SUPPORTED_IMAGE_FORMATS } from "@/constants/video";
+import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES, UPLOAD_CONSTRAINTS, SUPPORTED_VIDEO_FORMATS, SUPPORTED_IMAGE_FORMATS, VALIDATION_RULES } from "@/constants/video";
 import { BUTTON_LABELS, GENERATION_HELPER, CHECKLIST_LABELS } from "@/constants/ui";
 import { validateFile } from "@/lib/fileValidation";
 import { uploadFile } from "@/lib/upload";
@@ -23,6 +23,7 @@ export interface GenerationOptions {
 export interface VideoInputPanelProps {
   onSourceTypeChange?: (sourceType: SourceType) => void;
   onHookTextChange?: (hookText: string) => void;
+  onVideoDescriptionChange?: (videoDescription: string) => void;
   onToneChange?: (tone: HookTone) => void;
   onFileUpload?: (type: 'video' | 'images', assetId: string) => void;
   hasVideoUploaded?: boolean;
@@ -37,6 +38,7 @@ export interface VideoInputPanelProps {
 export const VideoInputPanel = ({
   onSourceTypeChange,
   onHookTextChange,
+  onVideoDescriptionChange,
   onToneChange,
   onFileUpload,
   hasVideoUploaded = false,
@@ -49,6 +51,7 @@ export const VideoInputPanel = ({
 }: VideoInputPanelProps) => {
   const [sourceType, setSourceType] = useState<SourceType>(THUMBNAIL_SOURCE_TYPES.VIDEO_FRAMES);
   const [hookText, setHookText] = useState("");
+  const [videoDescription, setVideoDescription] = useState("");
   const [tone, setTone] = useState<HookTone>(HOOK_TONES.VIRAL);
   const [sourceAlert, setSourceAlert] = useState<InlineAlert | null>(null);
   const [uploadedFile, setUploadedFile] = useState<UploadedFileInfo | null>(null);
@@ -157,6 +160,11 @@ export const VideoInputPanel = ({
   const handleHookTextChange = (newHookText: string) => {
     setHookText(newHookText);
     onHookTextChange?.(newHookText);
+  };
+
+  const handleVideoDescriptionChange = (newVideoDescription: string) => {
+    setVideoDescription(newVideoDescription);
+    onVideoDescriptionChange?.(newVideoDescription);
   };
 
   const handleToneChange = (newTone: HookTone) => {
@@ -277,11 +285,39 @@ export const VideoInputPanel = ({
           </div>
         </div>
 
-        {/* Step 3: Choose tone */}
+        {/* Step 3: Video description (alternative context when hook text is empty) */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
               3
+            </div>
+            <h3 className="text-sm font-semibold text-slate-900">Video description <span className="font-normal text-slate-500">(optional)</span></h3>
+          </div>
+          <div className="pl-7">
+            <p className="text-xs text-slate-500 mb-2">
+              Describe what your video is about. This helps generate better metadata when hook text is empty.
+            </p>
+            <textarea
+              id="video-description"
+              value={videoDescription}
+              onChange={(e) => handleVideoDescriptionChange(e.target.value)}
+              placeholder="e.g., A tutorial about building React applications with Next.js, covering routing, data fetching, and deployment..."
+              className="w-full min-h-[100px] px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+              maxLength={VALIDATION_RULES.VIDEO_CONTEXT_MAX_LENGTH}
+              aria-describedby="video-description-hint"
+            />
+            <div id="video-description-hint" className="flex justify-between mt-1">
+              <span className="text-xs text-slate-500">Provide context about your video content</span>
+              <span className="text-xs text-slate-400">{videoDescription.length}/{VALIDATION_RULES.VIDEO_CONTEXT_MAX_LENGTH}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 4: Choose tone */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+              4
             </div>
             <h3 className="text-sm font-semibold text-slate-900">Choose tone</h3>
           </div>
@@ -293,12 +329,12 @@ export const VideoInputPanel = ({
           </div>
         </div>
 
-        {/* Step 4: Select what to generate */}
+        {/* Step 5: Select what to generate */}
         {onGenerationOptionsChange && (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
-                4
+                5
               </div>
               <h3 className="text-sm font-semibold text-slate-900">Select what to generate</h3>
             </div>

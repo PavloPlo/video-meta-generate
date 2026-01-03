@@ -1,6 +1,8 @@
 export const VALIDATION_RULES = {
   TITLE_MAX_LENGTH: 100,
   DESCRIPTION_MAX_LENGTH: 5000,
+  // Video context/description input (used as context for AI generation, not the generated description)
+  VIDEO_CONTEXT_MAX_LENGTH: 500,
   TAGS_MAX_COUNT: 15,
   THUMBNAIL_VARIANTS_MAX: 6,
   THUMBNAIL_VARIANTS_INITIAL: 3,

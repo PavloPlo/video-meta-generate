@@ -5,6 +5,7 @@ import { VideoInputPanel, type GenerationOptions } from "@/components/molecules/
 import { VideoPreviewPanel } from "@/components/molecules/VideoPreviewPanel";
 import { Button } from "@/components/atoms/Button";
 import { generateThumbnails } from "@/lib/thumbnails";
+import { generateDescription as generateDescriptionApi, generateTags as generateTagsApi } from "@/lib/metadata";
 import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES, VALIDATION_RULES } from "@/constants/video";
 import { BUTTON_LABELS, MOBILE_TABS, ALERT_MESSAGES } from "@/constants/ui";
 import type { ThumbnailVariant, SourceType, HookTone, SectionStatus } from "@/lib/types/thumbnails";
@@ -12,6 +13,7 @@ import type { ThumbnailVariant, SourceType, HookTone, SectionStatus } from "@/li
 interface MobileSessionState {
     sourceType: SourceType;
     hookText: string;
+    videoDescription: string;
     tone: HookTone;
     hasVideoUploaded: boolean;
     hasImagesUploaded: boolean;
@@ -21,7 +23,8 @@ interface MobileSessionState {
     regenerationCount: number;
     description: string;
     tags: string[];
-    lastGeneratedAt?: Date;
+    // Stored as ISO string in localStorage, converted to Date when restored
+    lastGeneratedAt?: string;
     generationOptions: GenerationOptions;
     thumbnailsStatus: SectionStatus;
     descriptionStatus: SectionStatus;
@@ -38,6 +41,7 @@ export const MobileMetadataForm = () => {
     const [sessionState, setSessionState] = useState<MobileSessionState>({
         sourceType: THUMBNAIL_SOURCE_TYPES.VIDEO_FRAMES,
         hookText: '',
+        videoDescription: '',
         tone: HOOK_TONES.VIRAL,
         hasVideoUploaded: false,
         hasImagesUploaded: false,
@@ -97,6 +101,10 @@ export const MobileMetadataForm = () => {
         updateSessionState({ hookText });
     };
 
+    const handleVideoDescriptionChange = (videoDescription: string) => {
+        updateSessionState({ videoDescription });
+    };
+
     const handleToneChange = (tone: HookTone) => {
         updateSessionState({ tone });
     };
@@ -139,7 +147,7 @@ export const MobileMetadataForm = () => {
         return hasAssets && hookTextValid;
     };
 
-    const generateThumbnailsSection = async () => {
+    const generateThumbnailsSection = async (): Promise<boolean> => {
         updateSessionState({ thumbnailsStatus: "loading", thumbnailsError: null });
 
         try {
@@ -159,76 +167,68 @@ export const MobileMetadataForm = () => {
                 selectedVariantId: newVariants.length > 0 ? newVariants[0].id : null,
                 thumbnailsStatus: "success",
             });
+            return true;
         } catch (error) {
             updateSessionState({
                 thumbnailsError: error instanceof Error ? error.message : ALERT_MESSAGES.THUMBNAILS_GENERATION_FAILED,
                 thumbnailsStatus: "error",
             });
+            return false;
         }
     };
 
-    const generateDescription = async () => {
+    const generateDescription = async (): Promise<{ success: boolean; description?: string }> => {
         updateSessionState({ descriptionStatus: "loading", descriptionError: null });
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Simulate random failure for testing (10% chance)
-            if (Math.random() < 0.1) {
-                throw new Error("Failed to generate description");
-            }
-
-            const mockDescriptions = {
-                viral: `🚀 ${sessionState.hookText || 'This Changed Everything!'}
-
-What you're about to discover will completely transform how you think about this topic. In this video, I break down the exact strategies that helped me achieve incredible results.`,
-                curiosity: `❓ ${sessionState.hookText || 'You Won\'t Believe What I Found'}
-
-Have you ever wondered why some people seem to have all the answers? Today, I'm diving deep into a discovery that completely changed my perspective.`,
-                educational: `📚 ${sessionState.hookText || 'The Complete Guide You\'ve Been Waiting For'}
-
-Welcome to the most comprehensive guide on this topic. Whether you're just getting started or looking to deepen your knowledge, this video covers everything you need to know.`
-            };
+            // Call the description API
+            // TODO: The API returns hardcoded responses when USE_AI_GENERATION=false
+            // Set USE_AI_GENERATION=true in src/app/api/metadata/description/route.ts for real AI
+            const response = await generateDescriptionApi({
+                hookText: sessionState.hookText.trim(),
+                tone: sessionState.tone,
+                // Pass videoDescription as additional context when hookText is empty
+                videoDescription: sessionState.videoDescription.trim() || undefined,
+            });
 
             updateSessionState({
-                description: mockDescriptions[sessionState.tone],
+                description: response.description,
                 descriptionStatus: "success",
             });
+            return { success: true, description: response.description };
         } catch (error) {
             updateSessionState({
                 descriptionError: error instanceof Error ? error.message : ALERT_MESSAGES.DESCRIPTION_GENERATION_FAILED,
                 descriptionStatus: "error",
             });
+            return { success: false };
         }
     };
 
-    const generateTags = async () => {
+    const generateTags = async (description?: string): Promise<boolean> => {
         updateSessionState({ tagsStatus: "loading", tagsError: null });
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1200));
-
-            // Simulate random failure for testing (10% chance)
-            if (Math.random() < 0.1) {
-                throw new Error("Failed to generate tags");
-            }
-
-            const baseTags = ['tutorial', 'guide', 'howto', 'tips', 'education'];
-            const toneTags = {
-                viral: ['viral', 'trending', 'mustwatch', 'gamechanger', 'lifechanging'],
-                curiosity: ['interesting', 'discovery', 'mystery', 'explained', 'revealed'],
-                educational: ['learn', 'study', 'knowledge', 'skills', 'masterclass']
-            };
+            // Call the tags API
+            // TODO: The API returns hardcoded responses when USE_AI_GENERATION=false
+            // Set USE_AI_GENERATION=true in src/app/api/metadata/tags/route.ts for real AI
+            const response = await generateTagsApi({
+                hookText: sessionState.hookText.trim(),
+                tone: sessionState.tone,
+                description, // Pass the provided description for context if available
+            });
 
             updateSessionState({
-                tags: [...baseTags, ...toneTags[sessionState.tone], '2024', 'new', 'best'],
+                tags: response.tags,
                 tagsStatus: "success",
             });
+            return true;
         } catch (error) {
             updateSessionState({
                 tagsError: error instanceof Error ? error.message : ALERT_MESSAGES.TAGS_GENERATION_FAILED,
                 tagsStatus: "error",
             });
+            return false;
         }
     };
 
@@ -237,32 +237,39 @@ Welcome to the most comprehensive guide on this topic. Whether you're just getti
         setIsGenerating(true);
 
         try {
-            updateSessionState({ lastGeneratedAt: new Date() });
+            updateSessionState({ lastGeneratedAt: new Date().toISOString() });
 
-            // Generate all selected sections in parallel
-            const promises: Promise<void>[] = [];
+            // Generate sections, ensuring description completes before tags for better context
+            const promises: Promise<boolean>[] = [];
+            let descriptionSuccess = false;
 
+            // Start thumbnail generation (independent)
             if (sessionState.generationOptions.thumbnails) {
                 promises.push(generateThumbnailsSection());
             }
 
+            // Generate description first (needed for tags context)
+            let generatedDescription: string | undefined;
             if (sessionState.generationOptions.description) {
-                promises.push(generateDescription());
+                const descriptionResult = await generateDescription();
+                descriptionSuccess = descriptionResult.success;
+                generatedDescription = descriptionResult.description;
+                promises.push(Promise.resolve(descriptionSuccess));
             }
 
+            // Generate tags (can use newly generated description for better context)
             if (sessionState.generationOptions.tags) {
-                promises.push(generateTags());
+                promises.push(generateTags(generatedDescription));
             }
 
-            // Wait for all generations to complete (don't fail if one fails)
-            await Promise.allSettled(promises);
+            // Wait for all remaining generations to complete (don't fail if one fails)
+            const results = await Promise.allSettled(promises);
 
-            // Announce completion to screen readers
-            const successCount = [
-                sessionState.generationOptions.thumbnails && sessionState.thumbnailsStatus === 'success',
-                sessionState.generationOptions.description && sessionState.descriptionStatus === 'success',
-                sessionState.generationOptions.tags && sessionState.tagsStatus === 'success',
-            ].filter(Boolean).length;
+            // Count successful generations from the settled results
+            // Each generation function returns true on success, false on error
+            const successCount = results.filter(
+                (result) => result.status === 'fulfilled' && result.value === true
+            ).length;
 
             if (successCount > 0) {
                 setStatusAnnouncement(`Generation complete. ${successCount} section${successCount > 1 ? 's' : ''} successfully generated.`);
@@ -373,6 +380,7 @@ Welcome to the most comprehensive guide on this topic. Whether you're just getti
                         <VideoInputPanel
                             onSourceTypeChange={handleSourceTypeChange}
                             onHookTextChange={handleHookTextChange}
+                            onVideoDescriptionChange={handleVideoDescriptionChange}
                             onToneChange={handleToneChange}
                             onFileUpload={handleFileUpload}
                             hasVideoUploaded={sessionState.hasVideoUploaded}

@@ -4,14 +4,16 @@ import { useState } from "react";
 import { VideoInputPanel, type GenerationOptions } from "@/components/molecules/VideoInputPanel";
 import { VideoPreviewPanel } from "@/components/molecules/VideoPreviewPanel";
 import { generateThumbnails } from "@/lib/thumbnails";
-import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES, VALIDATION_RULES, ALERT_SCOPES, ALERT_KINDS } from "@/constants/video";
-import { BUTTON_LABELS, ALERT_MESSAGES } from "@/constants/ui";
-import type { ThumbnailVariant, SourceType, HookTone, InlineAlert, SectionStatus } from "@/lib/types/thumbnails";
+import { generateDescription as generateDescriptionApi, generateTags as generateTagsApi } from "@/lib/metadata";
+import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES, VALIDATION_RULES } from "@/constants/video";
+import { ALERT_MESSAGES } from "@/constants/ui";
+import type { ThumbnailVariant, SourceType, HookTone, SectionStatus } from "@/lib/types/thumbnails";
 
 export const VideoMetadataForm = () => {
   // Thumbnail variants state
   const [sourceType, setSourceType] = useState<SourceType>(THUMBNAIL_SOURCE_TYPES.VIDEO_FRAMES);
   const [hookText, setHookText] = useState("");
+  const [videoDescription, setVideoDescription] = useState("");
   const [tone, setTone] = useState<HookTone>(HOOK_TONES.VIRAL);
   const [variants, setVariants] = useState<ThumbnailVariant[]>([]);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
@@ -47,6 +49,10 @@ export const VideoMetadataForm = () => {
     setHookText(newHookText);
   };
 
+  const handleVideoDescriptionChange = (newVideoDescription: string) => {
+    setVideoDescription(newVideoDescription);
+  };
+
   const handleToneChange = (newTone: HookTone) => {
     setTone(newTone);
   };
@@ -55,76 +61,52 @@ export const VideoMetadataForm = () => {
     setVariants(newVariants);
   };
 
-  const generateDescription = async () => {
+  const generateDescription = async (): Promise<{ success: boolean; description?: string }> => {
     setDescriptionStatus("loading");
     setDescriptionError(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call the description API
+      // TODO: The API returns hardcoded responses when USE_AI_GENERATION=false
+      // Set USE_AI_GENERATION=true in src/app/api/metadata/description/route.ts for real AI
+      const response = await generateDescriptionApi({
+        hookText: hookText.trim(),
+        tone,
+        // Pass videoDescription as additional context when hookText is empty
+        videoDescription: videoDescription.trim() || undefined,
+      });
 
-      // Simulate random failure for testing (10% chance)
-      if (Math.random() < 0.1) {
-        throw new Error("Failed to generate description");
-      }
-
-      const mockDescriptions = {
-        viral: `🚀 ${hookText || 'This Changed Everything!'}
-
-What you're about to discover will completely transform how you think about this topic. In this video, I break down the exact strategies that helped me achieve incredible results.
-
-From complete beginner to expert level - here's exactly what worked for me and how you can apply it starting today.
-
-Don't forget to like, subscribe, and hit that notification bell for more game-changing content! 🔥`,
-        curiosity: `❓ ${hookText || 'You Won\'t Believe What I Found'}
-
-Have you ever wondered why some people seem to have all the answers? Today, I'm diving deep into a discovery that completely changed my perspective.
-
-What I uncovered might surprise you, but it could be the missing piece you've been looking for. Let's explore this together and see what we can learn.
-
-Share your thoughts in the comments - what's your biggest takeaway from this?`,
-        educational: `📚 ${hookText || 'The Complete Guide You\'ve Been Waiting For'}
-
-Welcome to the most comprehensive guide on this topic. Whether you're just getting started or looking to deepen your knowledge, this video covers everything you need to know.
-
-We'll break down complex concepts into simple, actionable steps that anyone can follow. By the end of this video, you'll have a clear understanding and practical skills you can implement immediately.
-
-If you found this helpful, please give it a thumbs up and consider subscribing for more detailed tutorials!`
-      };
-
-      setDescription(mockDescriptions[tone]);
+      setDescription(response.description);
       setDescriptionStatus("success");
+      return { success: true, description: response.description };
     } catch (error) {
       setDescriptionError(error instanceof Error ? error.message : ALERT_MESSAGES.DESCRIPTION_GENERATION_FAILED);
       setDescriptionStatus("error");
+      return { success: false };
     }
   };
 
-  const generateTags = async () => {
+  const generateTags = async (description?: string): Promise<boolean> => {
     setTagsStatus("loading");
     setTagsError(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      // Call the tags API
+      // TODO: The API returns hardcoded responses when USE_AI_GENERATION=false
+      // Set USE_AI_GENERATION=true in src/app/api/metadata/tags/route.ts for real AI
+      const response = await generateTagsApi({
+        hookText: hookText.trim(),
+        tone,
+        description, // Pass the provided description for context if available
+      });
 
-      // Simulate random failure for testing (10% chance)
-      if (Math.random() < 0.1) {
-        throw new Error("Failed to generate tags");
-      }
-
-      const baseTags = ['tutorial', 'guide', 'howto', 'tips', 'education'];
-      const toneTags = {
-        viral: ['viral', 'trending', 'mustwatch', 'gamechanger', 'lifechanging'],
-        curiosity: ['interesting', 'discovery', 'mystery', 'explained', 'revealed'],
-        educational: ['learn', 'study', 'knowledge', 'skills', 'masterclass']
-      };
-
-      setTags([...baseTags, ...toneTags[tone], '2024', 'new', 'best']);
+      setTags(response.tags);
       setTagsStatus("success");
+      return true;
     } catch (error) {
       setTagsError(error instanceof Error ? error.message : ALERT_MESSAGES.TAGS_GENERATION_FAILED);
       setTagsStatus("error");
+      return false;
     }
   };
 
@@ -140,7 +122,7 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
     return true;
   })();
 
-  const generateThumbnailsSection = async () => {
+  const generateThumbnailsSection = async (): Promise<boolean> => {
     setThumbnailsStatus("loading");
     setThumbnailsError(null);
 
@@ -164,9 +146,11 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
       }
 
       setThumbnailsStatus("success");
+      return true;
     } catch (error) {
       setThumbnailsError(error instanceof Error ? error.message : ALERT_MESSAGES.THUMBNAILS_GENERATION_FAILED);
       setThumbnailsStatus("error");
+      return false;
     }
   };
 
@@ -175,38 +159,48 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
 
     setIsGeneratingAll(true);
 
-    // Generate all selected sections in parallel
-    const promises: Promise<void>[] = [];
+    try {
+      // Generate sections, ensuring description completes before tags for better context
+      const promises: Promise<boolean>[] = [];
+      let generatedDescription: string | undefined;
 
-    if (generationOptions.thumbnails) {
-      promises.push(generateThumbnailsSection());
+      // Start thumbnail generation (independent)
+      if (generationOptions.thumbnails) {
+        promises.push(generateThumbnailsSection());
+      }
+
+      // Generate description first (needed for tags context)
+      if (generationOptions.description) {
+        const descriptionResult = await generateDescription();
+        generatedDescription = descriptionResult.description;
+        promises.push(Promise.resolve(descriptionResult.success));
+      }
+
+      // Generate tags (can use newly generated description for better context)
+      if (generationOptions.tags) {
+        promises.push(generateTags(generatedDescription));
+      }
+
+      // Wait for all remaining generations to complete (don't fail if one fails)
+      const results = await Promise.allSettled(promises);
+
+      // Count successful generations from the settled results
+      // Each generation function returns true on success, false on error
+      const successCount = results.filter(
+        (result) => result.status === 'fulfilled' && result.value === true
+      ).length;
+
+      if (successCount > 0) {
+        setStatusAnnouncement(`Generation complete. ${successCount} section${successCount > 1 ? 's' : ''} successfully generated.`);
+        // Clear announcement after screen readers have time to read it
+        setTimeout(() => setStatusAnnouncement(''), 3000);
+      }
+    } catch (error) {
+      console.error('Generation failed:', error);
+      // Error handling could be added here if needed for analytics/logging
+    } finally {
+      setIsGeneratingAll(false);
     }
-
-    if (generationOptions.description) {
-      promises.push(generateDescription());
-    }
-
-    if (generationOptions.tags) {
-      promises.push(generateTags());
-    }
-
-    // Wait for all generations to complete (don't fail if one fails)
-    await Promise.allSettled(promises);
-
-    // Announce completion to screen readers
-    const successCount = [
-      generationOptions.thumbnails && thumbnailsStatus === 'success',
-      generationOptions.description && descriptionStatus === 'success',
-      generationOptions.tags && tagsStatus === 'success',
-    ].filter(Boolean).length;
-
-    if (successCount > 0) {
-      setStatusAnnouncement(`Generation complete. ${successCount} section${successCount > 1 ? 's' : ''} successfully generated.`);
-      // Clear announcement after screen readers have time to read it
-      setTimeout(() => setStatusAnnouncement(''), 3000);
-    }
-
-    setIsGeneratingAll(false);
   };
 
   const handleSelectedVariantChange = (variantId: string | null) => {
@@ -242,6 +236,7 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
         <VideoInputPanel
           onSourceTypeChange={handleSourceTypeChange}
           onHookTextChange={handleHookTextChange}
+          onVideoDescriptionChange={handleVideoDescriptionChange}
           onToneChange={handleToneChange}
           onFileUpload={(type, assetId) => {
             if (type === 'video') {
