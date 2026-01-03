@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -50,53 +50,16 @@ jobs:
 
   deploy:
     needs: build-and-push
-    runs-on: ubuntu-latest
-    environment: production
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-
-      - name: Configure kubeconfig
+      - name: Verify kubectl access
         run: |
-          if [ -z "${{ secrets.PROD_KUBECONFIG }}" ]; then
-            echo "Error: PROD_KUBECONFIG secret is not set"
-            echo "Please set the PROD_KUBECONFIG secret in your GitHub repository settings."
-            exit 1
-          fi
-
-          # Check if the secret looks like a placeholder
-          if [[ "${{ secrets.PROD_KUBECONFIG }}" == "***" ]] || [[ "${{ secrets.PROD_KUBECONFIG }}" == *"placeholder"* ]]; then
-            echo "Error: PROD_KUBECONFIG secret appears to be a placeholder value"
-            echo "Please set it to a proper base64-encoded kubeconfig."
-            exit 1
-          fi
-
-          mkdir -p ~/.kube
-
-          # Try to decode the kubeconfig
-          if ! echo "${{ secrets.PROD_KUBECONFIG }}" | base64 -d > ~/.kube/config 2>/dev/null; then
-            echo "Error: Failed to decode PROD_KUBECONFIG secret"
-            echo "Make sure the secret value is properly base64-encoded."
-            echo "To encode your kubeconfig, run: cat ~/.kube/config | base64 -w 0"
-            exit 1
-          fi
-
-          # Set KUBECONFIG environment variable explicitly
-          echo "KUBECONFIG=$HOME/.kube/config" >> $GITHUB_ENV
-
-          # Verify kubeconfig file was created and is not empty
-          if [ ! -f ~/.kube/config ] || [ ! -s ~/.kube/config ]; then
-            echo "Error: kubeconfig file was not created or is empty"
-            exit 1
-          fi
-
-          echo "✅ Kubeconfig configured successfully"
-          # Verify kubeconfig is valid
-          kubectl config current-context || echo "Warning: Could not get current context"
-          kubectl cluster-info --request-timeout=10s || echo "Warning: Could not get cluster info"
+          kubectl config current-context
+          kubectl cluster-info
+          echo "✅ Kubernetes cluster is accessible"
 
       - name: Deploy with Kustomize
         run: |
