@@ -2,21 +2,22 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 # Base configurations
-bases:
+resources:
   - ../../base
 
 # Override namespace for production
 namespace: production
 
 # Patches for production environment
-patchesStrategicMerge:
-  - patches/hpa-scaling.yaml
-  - patches/app-resources.yaml
+patches:
+  - path: patches/hpa-scaling.yaml
+  - path: patches/app-resources.yaml
 
 # Environment-specific labels
-commonLabels:
-  environment: production
-  app.kubernetes.io/environment: production
+labels:
+  - pairs:
+      environment: production
+      app.kubernetes.io/environment: production
 
 # Images with production-specific tags
 images:
@@ -25,5 +26,4 @@ images:
 
 # Resources that are production-specific
 resources:
-  - namespace.yaml
   - patches/ingress.yaml

@@ -2,21 +2,22 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 # Base configurations
-bases:
+resources:
   - ../../base
 
 # Override namespace for staging
 namespace: staging
 
 # Patches for staging environment
-patchesStrategicMerge:
-  - patches/hpa-scaling.yaml
-  - patches/app-resources.yaml
+patches:
+  - path: patches/hpa-scaling.yaml
+  - path: patches/app-resources.yaml
 
 # Environment-specific labels
-commonLabels:
-  environment: staging
-  app.kubernetes.io/environment: staging
+labels:
+  - pairs:
+      environment: staging
+      app.kubernetes.io/environment: staging
 
 # Images with staging-specific tags
 images:
@@ -25,5 +26,4 @@ images:
 
 # Resources that are staging-specific
 resources:
-  - namespace.yaml
   - patches/ingress.yaml

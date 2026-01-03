@@ -9,3 +9,10 @@ metadata:
 data:
   NODE_ENV: "production"
   NEXT_TELEMETRY_DISABLED: "1"
+  # Storage configuration (optional)
+  STORAGE_REGION: "us-east-1"
+  STORAGE_FORCE_PATH_STYLE: "false"
+  # AI Provider configuration (optional with defaults)
+  AI_PROVIDER: "openai"
+  AI_TEXT_MODEL: "gpt-4o"
+  AI_IMAGE_MODEL: "dall-e-3"
