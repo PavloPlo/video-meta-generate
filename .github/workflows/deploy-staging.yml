@@ -91,14 +91,6 @@ jobs:
             --from-literal=SESSION_TTL_DAYS=${{ secrets.SESSION_TTL_DAYS }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
-          # Create PostgreSQL secrets (staging only)
-          kubectl create secret generic postgres-secrets \
-            -n staging \
-            --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-            --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-            --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
-            --dry-run=client -o yaml | kubectl apply -f -
-
           # Create MinIO secrets (staging only)
           kubectl create secret generic minio-secrets \
             -n staging \
