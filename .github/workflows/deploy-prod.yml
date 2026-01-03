@@ -65,8 +65,8 @@ jobs:
         run: |
           cd k8s/overlays/production
 
-          # Update image tag
-          kustomize edit set image ghcr.io/${{ github.repository }}=${{ needs.build-and-push.outputs.image }}
+          # Update image tag using kubectl kustomize
+          kubectl kustomize . | sed "s|ghcr.io/${{ github.repository }}:latest|${{ needs.build-and-push.outputs.image }}|g" > /tmp/manifests.yaml
 
           # Create application secrets
           kubectl create secret generic app-secrets \
@@ -82,7 +82,7 @@ jobs:
             --dry-run=client -o yaml | kubectl apply --validate=false -f -
 
           # Apply manifests (production uses managed database and cloud storage)
-          kustomize build . | kubectl apply --validate=false -f -
+          kubectl apply --validate=false -f /tmp/manifests.yaml
 
           # Wait for rollout
           kubectl rollout status deployment/video-meta-app -n production --timeout=300s
