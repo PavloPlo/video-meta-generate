@@ -1,5 +1,6 @@
 export const API_ENDPOINTS = {
   HEALTH: '/api/health',
+  UPLOAD: '/api/upload',
   VIDEOS: '/api/videos',
   METADATA: '/api/metadata',
   ANALYTICS: '/api/analytics',

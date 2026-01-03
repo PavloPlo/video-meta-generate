@@ -15,6 +15,17 @@ const EnvSchema = z.object({
     .max(365, "SESSION_TTL_DAYS must be <= 365")
     .default(14),
 
+  // Storage (optional - for file uploads)
+  STORAGE_ENDPOINT: z.string().url().optional(),
+  STORAGE_REGION: z.string().min(1).default("us-east-1"),
+  STORAGE_BUCKET: z.string().min(1).optional(),
+  STORAGE_ACCESS_KEY_ID: z.string().min(1).optional(),
+  STORAGE_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  STORAGE_FORCE_PATH_STYLE: z
+    .string()
+    .transform((val) => val === "true")
+    .default("false"),
+
   NODE_ENV: z.enum(["development", "test", "production"]).optional(),
 });
 
