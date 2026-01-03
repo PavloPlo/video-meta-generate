@@ -61,8 +61,22 @@ jobs:
 
       - name: Configure kubeconfig
         run: |
+          if [ -z "${{ secrets.PROD_KUBECONFIG }}" ]; then
+            echo "Error: PROD_KUBECONFIG secret is not set"
+            exit 1
+          fi
           mkdir -p ~/.kube
           echo "${{ secrets.PROD_KUBECONFIG }}" | base64 -d > ~/.kube/config
+          # Set KUBECONFIG environment variable explicitly
+          echo "KUBECONFIG=$HOME/.kube/config" >> $GITHUB_ENV
+          # Verify kubeconfig file was created
+          if [ ! -f ~/.kube/config ]; then
+            echo "Error: kubeconfig file was not created"
+            exit 1
+          fi
+          # Verify kubeconfig is valid
+          kubectl config current-context || echo "Warning: Could not get current context"
+          kubectl cluster-info --request-timeout=10s || echo "Warning: Could not get cluster info"
 
       - name: Deploy with Kustomize
         run: |
