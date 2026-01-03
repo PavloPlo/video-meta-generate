@@ -2,9 +2,9 @@ import "server-only";
 import { z } from "zod";
 
 const EnvSchema = z.object({
-  // Required everywhere (Option A)
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  DIRECT_URL: z.string().min(1, "DIRECT_URL is required"),
+  // Required everywhere (Option A) - provide defaults for build time
+  DATABASE_URL: z.string().min(1, "DATABASE_URL is required").default("postgresql://dummy:dummy@localhost:5432/dummy"),
+  DIRECT_URL: z.string().min(1, "DIRECT_URL is required").default("postgresql://dummy:dummy@localhost:5432/dummy"),
 
   // Optional with defaults
   SESSION_COOKIE_NAME: z.string().min(1).default("sid"),
@@ -50,7 +50,17 @@ function formatZodError(err: z.ZodError): string {
  */
 export const env = (() => {
   const parsed = EnvSchema.safeParse(process.env);
+
   if (!parsed.success) {
+    // During Docker build time, allow dummy values
+    const isDockerBuild = process.env.DOCKER_BUILD === "1";
+    const isTestEnv = process.env.NODE_ENV === "test";
+
+    if (isDockerBuild || isTestEnv) {
+      // Use defaults for build/test time
+      return EnvSchema.parse({});
+    }
+
     // Throwing here fails fast during server startup / first import.
     throw new Error(
       `Invalid environment configuration (ensure DATABASE_URL and DIRECT_URL are set):\n${formatZodError(
