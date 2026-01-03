@@ -80,7 +80,7 @@ jobs:
           echo "Deploying image: $IMAGE_TAG"
 
           # Generate manifests and replace image placeholder
-          kubectl kustomize . | sed "s|ghcr.io/video-meta-generate:latest|$IMAGE_TAG|g" > /tmp/manifests.yaml
+          kubectl kustomize . | sed "s|ghcr.io/pavloplo/video-meta-generate:latest|$IMAGE_TAG|g" > /tmp/manifests.yaml
 
           # Create namespace first (if not exists)
           kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -

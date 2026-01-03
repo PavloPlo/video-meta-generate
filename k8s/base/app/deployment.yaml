@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/video-meta-generate:latest
+          image: ghcr.io/pavloplo/video-meta-generate:latest
           ports:
             - containerPort: 3000
               name: http
