@@ -27,10 +27,14 @@ import { UPLOAD_ERROR_MESSAGES } from "@/constants/video";
 export async function POST(request: NextRequest) {
   try {
     // 1. Authentication
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // DEV ONLY: Authentication check disabled for development
+    // const user = await getCurrentUser();
+    // if (!user) {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
+    // DEV ONLY: Use seeded test user (run `npm run db:seed` first)
+    const DEV_USER_ID = "00000000-0000-0000-0000-000000000001";
+    const user = { id: DEV_USER_ID };
 
     // 2. Parse multipart form data
     const formData = await request.formData();

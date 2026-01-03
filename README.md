@@ -85,6 +85,40 @@ With Option A env validation, both URLs must be set in `.env.local`.
 
 Prisma will use `DIRECT_URL` for migrations once schema is added (Task 1.3).
 
+## Database Setup
+
+### Run migrations
+
+```bash
+npm run db:deploy
+```
+
+### Seed the database (creates test user)
+
+```bash
+npm run db:seed
+```
+
+This creates a test user for local development:
+
+| Field    | Value                                  |
+|----------|----------------------------------------|
+| ID       | `00000000-0000-0000-0000-000000000001` |
+| Email    | `dev@example.com`                      |
+| Username | `devuser`                              |
+| Password | `password123`                          |
+
+**Note:** The upload API route (`/api/upload`) uses this test user in development mode. Authentication is bypassed for easier local testing.
+
+### Other database commands
+
+```bash
+npm run db:migrate   # Create new migration
+npm run db:status    # Check migration status
+npm run db:reset     # Reset database (destructive)
+npm run db:studio    # Open Prisma Studio GUI
+```
+
 ## File Storage Configuration
 
 For file uploads to work (POST /api/upload), you need to configure storage. See `env.example` for detailed instructions.

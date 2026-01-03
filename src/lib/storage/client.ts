@@ -79,14 +79,16 @@ export async function getFileUrl(storageKey: string): Promise<string> {
     throw new Error("Storage is not configured");
   }
 
-  // If using Supabase or custom endpoint, construct URL directly
-  if (env.STORAGE_ENDPOINT && env.STORAGE_FORCE_PATH_STYLE) {
+  // Check if using Supabase (has /s3 in endpoint)
+  const isSupabase = env.STORAGE_ENDPOINT?.includes("/s3");
+
+  if (isSupabase && env.STORAGE_ENDPOINT) {
     // Supabase-style URL
     const baseUrl = env.STORAGE_ENDPOINT.replace("/s3", "");
     return `${baseUrl}/object/public/${STORAGE_BUCKET}/${storageKey}`;
   }
 
-  // For AWS S3, use presigned URL
+  // For AWS S3 and MinIO, use presigned URL
   const command = new GetObjectCommand({
     Bucket: STORAGE_BUCKET,
     Key: storageKey,
