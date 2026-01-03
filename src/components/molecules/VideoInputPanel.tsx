@@ -10,7 +10,8 @@ import { FileUploadSummary, type UploadedFileInfo } from "@/components/atoms/Fil
 import { UploadProgress, type UploadStage } from "@/components/atoms/UploadProgress";
 import { THUMBNAIL_SOURCE_TYPES, HOOK_TONES, UPLOAD_CONSTRAINTS, SUPPORTED_VIDEO_FORMATS, SUPPORTED_IMAGE_FORMATS } from "@/constants/video";
 import { BUTTON_LABELS, GENERATION_HELPER, CHECKLIST_LABELS } from "@/constants/ui";
-import { validateFile, generateVideoThumbnail, generateImageThumbnail } from "@/lib/fileValidation";
+import { validateFile } from "@/lib/fileValidation";
+import { uploadFile } from "@/lib/upload";
 import type { SourceType, HookTone, InlineAlert } from "@/lib/types/thumbnails";
 
 export interface GenerationOptions {
@@ -23,7 +24,7 @@ export interface VideoInputPanelProps {
   onSourceTypeChange?: (sourceType: SourceType) => void;
   onHookTextChange?: (hookText: string) => void;
   onToneChange?: (tone: HookTone) => void;
-  onFileUpload?: (type: 'video' | 'images') => void;
+  onFileUpload?: (type: 'video' | 'images', assetId: string) => void;
   hasVideoUploaded?: boolean;
   hasImagesUploaded?: boolean;
   onGenerate?: () => void;
@@ -62,13 +63,8 @@ export const VideoInputPanel = ({
     setIsUploading(true);
 
     try {
-      // Stage 1: Uploading (simulate initial upload)
-      setUploadProgress({ stage: 'uploading', progress: 0 });
-      await new Promise(resolve => setTimeout(resolve, 100));
-      setUploadProgress({ stage: 'uploading', progress: 30 });
-
-      // Stage 2: Validate file
-      setUploadProgress({ stage: 'analyzing', progress: 40 });
+      // Stage 1: Client-side validation
+      setUploadProgress({ stage: 'analyzing', progress: 20 });
       const validationResult = await validateFile(file);
 
       if (!validationResult.isValid) {
@@ -84,27 +80,14 @@ export const VideoInputPanel = ({
         return;
       }
 
-      setUploadProgress({ stage: 'analyzing', progress: 60 });
+      // Stage 2: Upload to server
+      setUploadProgress({ stage: 'uploading', progress: 40 });
+      const uploadResponse = await uploadFile(file);
 
-      // Stage 3: Extract metadata and generate thumbnail
-      setUploadProgress({ stage: 'processing', progress: 70 });
+      setUploadProgress({ stage: 'processing', progress: 80 });
+
+      // Stage 3: Process response
       const isVideo = file.type.startsWith('video/');
-      let thumbnailUrl: string | undefined;
-
-      try {
-        if (isVideo) {
-          thumbnailUrl = await generateVideoThumbnail(file);
-        } else {
-          thumbnailUrl = await generateImageThumbnail(file);
-        }
-      } catch (error) {
-        console.error('Thumbnail generation failed:', error);
-        // Continue without thumbnail
-      }
-
-      setUploadProgress({ stage: 'processing', progress: 90 });
-
-      // Update source type
       const newSourceType = isVideo ? THUMBNAIL_SOURCE_TYPES.VIDEO_FRAMES : THUMBNAIL_SOURCE_TYPES.IMAGES;
       setSourceType(newSourceType);
       onSourceTypeChange?.(newSourceType);
@@ -112,18 +95,18 @@ export const VideoInputPanel = ({
       // Stage 4: Complete
       setUploadProgress({ stage: 'complete', progress: 100 });
 
-      // Set uploaded file info
+      // Set uploaded file info from API response
       const fileInfo: UploadedFileInfo = {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        duration: validationResult.duration,
-        thumbnailUrl,
+        name: uploadResponse.fileName,
+        size: uploadResponse.fileSize,
+        type: uploadResponse.fileType,
+        duration: uploadResponse.duration,
+        thumbnailUrl: uploadResponse.thumbnailUrl,
       };
       setUploadedFile(fileInfo);
 
-      // Notify parent
-      onFileUpload?.(isVideo ? 'video' : 'images');
+      // Notify parent with asset ID
+      onFileUpload?.(isVideo ? 'video' : 'images', uploadResponse.assetId);
 
       // Clear progress after a short delay
       setTimeout(() => {
@@ -138,7 +121,7 @@ export const VideoInputPanel = ({
       const alert: InlineAlert = {
         scope: 'source',
         kind: 'error',
-        message: error instanceof Error ? error.message : 'An error occurred while processing the file',
+        message: error instanceof Error ? error.message : 'An error occurred while uploading the file',
         isVisible: true,
       };
       setSourceAlert(alert);

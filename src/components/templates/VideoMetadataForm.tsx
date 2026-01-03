@@ -214,15 +214,16 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
   };
 
 
-  // Mock functions for asset upload (would be connected to actual upload system)
-  const handleVideoUpload = () => {
+  // Handle file upload with asset ID from API
+  const handleVideoUpload = (assetId: string) => {
     setHasVideoUploaded(true);
-    setAssetIds(['video-1']); // Mock asset ID
+    setAssetIds([assetId]);
   };
 
-  const handleImagesUpload = () => {
+  const handleImagesUpload = (assetId: string) => {
     setHasImagesUploaded(true);
-    setAssetIds(['image-1', 'image-2']); // Mock asset IDs
+    // For images, we can upload multiple files, so append to existing array
+    setAssetIds((prev) => [...prev, assetId]);
   };
 
   return (
@@ -242,11 +243,11 @@ If you found this helpful, please give it a thumbs up and consider subscribing f
           onSourceTypeChange={handleSourceTypeChange}
           onHookTextChange={handleHookTextChange}
           onToneChange={handleToneChange}
-          onFileUpload={(type) => {
+          onFileUpload={(type, assetId) => {
             if (type === 'video') {
-              handleVideoUpload();
+              handleVideoUpload(assetId);
             } else if (type === 'images') {
-              handleImagesUpload();
+              handleImagesUpload(assetId);
             }
           }}
           hasVideoUploaded={hasVideoUploaded}

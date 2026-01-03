@@ -101,16 +101,23 @@ export const MobileMetadataForm = () => {
         updateSessionState({ tone });
     };
 
-    const handleFileUpload = (type: 'video' | 'images') => {
+    const handleFileUpload = (type: 'video' | 'images', assetId: string) => {
         if (type === 'video') {
             updateSessionState({
                 hasVideoUploaded: true,
-                assetIds: ['video-1']
+                assetIds: [assetId]
             });
         } else if (type === 'images') {
-            updateSessionState({
-                hasImagesUploaded: true,
-                assetIds: ['image-1', 'image-2']
+            setSessionState((prev) => {
+                const newState = {
+                    ...prev,
+                    hasImagesUploaded: true,
+                    assetIds: [...(prev.assetIds || []), assetId]
+                };
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+                }
+                return newState;
             });
         }
     };
