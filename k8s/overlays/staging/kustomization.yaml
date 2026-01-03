@@ -4,6 +4,8 @@ kind: Kustomization
 # Base configurations
 resources:
   - ../../base
+  - postgres
+  - minio
 
 # Override namespace for staging
 namespace: staging

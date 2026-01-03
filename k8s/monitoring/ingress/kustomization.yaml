@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: monitoring-ingress
+
+resources:
+  - staging-grafana-ingress.yaml
+  - production-grafana-ingress.yaml
+  - staging-grafana-auth.yaml
+
+# Common labels for monitoring ingress resources
+commonLabels:
+  app.kubernetes.io/name: monitoring-ingress
+  app.kubernetes.io/component: ingress
+  app.kubernetes.io/part-of: monitoring

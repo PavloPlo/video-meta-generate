@@ -1,57 +1,95 @@
-name: Deploy Production
+name: Deploy to Production (Kubernetes)
 
 on:
   push:
     tags:
       - "release-*"
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  deploy:
-    environment: production
-    runs-on: self-hosted
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Debug deploy variables
-        env:
-          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
-          PROD_DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
-          SESSION_COOKIE_NAME: ${{ secrets.SESSION_COOKIE_NAME }}
-          SESSION_TTL_DAYS: ${{ secrets.SESSION_TTL_DAYS }}
-        run: |
-          set -e
-          check_var() {
-            local name="$1"
-            local value="$2"
-            if [ -n "$value" ]; then
-              echo "$name: set (length ${#value})"
-            else
-              echo "$name: missing"
-            fi
-          }
-          check_var "PROD_DATABASE_URL" "$PROD_DATABASE_URL"
-          check_var "PROD_DIRECT_URL" "$PROD_DIRECT_URL"
-          check_var "SESSION_COOKIE_NAME" "$SESSION_COOKIE_NAME"
-          check_var "SESSION_TTL_DAYS" "$SESSION_TTL_DAYS"
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         with:
-          node-version: "20"
-          cache: "npm"
-      - name: Install dependencies
-        run: npm ci
-      - name: Generate Prisma client
-        env:
-          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
-        run: npx prisma generate
-      - name: Deploy database migrations
-        env:
-          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
-          SESSION_COOKIE_NAME: ${{ secrets.SESSION_COOKIE_NAME }}
-          SESSION_TTL_DAYS: ${{ secrets.SESSION_TTL_DAYS }}
-          NODE_ENV: production
-        run: npm run db:deploy
-      - name: Deploy application
-        run: echo "TODO: add production deployment steps"
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=tag
+            type=sha,prefix=prod-
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}
+            DIRECT_URL=${{ secrets.PROD_DIRECT_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.PROD_KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Deploy with Kustomize
+        run: |
+          cd k8s/overlays/production
+
+          # Update image tag
+          kustomize edit set image ghcr.io/${{ github.repository }}=${{ needs.build-and-push.outputs.image_tag }}
+
+          # Create application secrets
+          kubectl create secret generic app-secrets \
+            --from-literal=DATABASE_URL=${{ secrets.PROD_DATABASE_URL }} \
+            --from-literal=DIRECT_URL=${{ secrets.PROD_DIRECT_URL }} \
+            --from-literal=SESSION_COOKIE_NAME=${{ secrets.SESSION_COOKIE_NAME }} \
+            --from-literal=SESSION_TTL_DAYS=${{ secrets.SESSION_TTL_DAYS }} \
+            --from-literal=STORAGE_BUCKET=${{ secrets.STORAGE_BUCKET }} \
+            --from-literal=STORAGE_ACCESS_KEY_ID=${{ secrets.STORAGE_ACCESS_KEY_ID }} \
+            --from-literal=STORAGE_SECRET_ACCESS_KEY=${{ secrets.STORAGE_SECRET_ACCESS_KEY }} \
+            --from-literal=STORAGE_REGION=${{ secrets.STORAGE_REGION }} \
+            --from-literal=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          # Apply manifests (production uses managed database and cloud storage)
+          kustomize build . | kubectl apply -f -
+
+          # Wait for rollout
+          kubectl rollout status deployment/video-meta-app -n production --timeout=300s
+
+      - name: Run database migrations
+        run: |
+          kubectl exec -n production deployment/video-meta-app -- npm run db:deploy

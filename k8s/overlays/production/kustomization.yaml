@@ -18,6 +18,8 @@ labels:
   - pairs:
       environment: production
       app.kubernetes.io/environment: production
+      database: managed
+      storage: cloud
 
 # Images with production-specific tags
 images:

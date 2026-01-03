@@ -1,0 +1,22 @@
+# Patch to remove PostgreSQL StatefulSet and PVC when using managed databases
+# This patch can be applied to overlays that use external/managed databases
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+$patch: delete
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+$patch: delete
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+$patch: delete

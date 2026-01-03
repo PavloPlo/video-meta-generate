@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Base PostgreSQL configuration (in-cluster for staging)
+resources:
+  - ../../../base/postgres
+
+# Staging-specific patches
+patches:
+  - path: patches/postgres-resources.yaml
+
+# Environment-specific labels
+labels:
+  - pairs:
+      environment: staging
+      app.kubernetes.io/environment: staging
+
+namespace: staging

@@ -13,7 +13,7 @@ Before deploying the application, you need to set up the following cluster prere
 
 ## Quick Start
 
-### Option 1: Deploy All Prerequisites at Once
+### Deploy All Prerequisites
 
 ```bash
 # Deploy all cluster prerequisites
@@ -26,7 +26,7 @@ kubectl get pods -n kube-system -l k8s-app=metrics-server
 kubectl get storageclass
 ```
 
-### Option 2: Deploy Prerequisites Individually
+### Deploy Prerequisites Individually
 
 ```bash
 # 1. Deploy NGINX Ingress Controller
@@ -171,14 +171,35 @@ kubectl apply -f https://raw.githubusercontent.com/digitalocean/csi-digitalocean
 
 2. **API Token**: Ensure your cluster has access to DigitalOcean API for volume operations.
 
-## Validation Scripts
+## Validation
 
 Use the provided validation script to check if all prerequisites are properly deployed:
 
 ```bash
-# Run validation script
+# Make script executable (Windows: skip this step)
 chmod +x k8s/cluster-setup/validate-setup.sh
+
+# Run validation
 ./k8s/cluster-setup/validate-setup.sh
+```
+
+Or verify each component manually:
+
+```bash
+# Check NGINX Ingress Controller
+kubectl get pods -n ingress-nginx
+kubectl get svc -n ingress-nginx
+
+# Check cert-manager
+kubectl get pods -n cert-manager
+kubectl get clusterissuer
+
+# Check metrics-server
+kubectl get pods -n kube-system -l k8s-app=metrics-server
+kubectl top nodes
+
+# Check storage classes
+kubectl get storageclass
 ```
 
 ## Troubleshooting

@@ -1,0 +1,22 @@
+# Patch to remove MinIO StatefulSet and PVC when using cloud storage
+# This patch can be applied to overlays that use external/cloud storage
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+$patch: delete
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+$patch: delete
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+$patch: delete
