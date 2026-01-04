@@ -11,14 +11,19 @@ export default function HeaderSticky() {
   return (
     <header className="sticky top-4 z-20 rounded-3xl border border-slate-200/80 bg-white/80 p-4 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.5)] backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
-            Video Meta Generate
-          </p>
-          <p className="text-xs text-slate-400">
-            Metadata intelligence for modern video teams.
-          </p>
-        </div>
+        <Link className="flex items-center gap-3" href="/">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            YH
+          </span>
+          <span>
+            <span className="block text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
+              youhook
+            </span>
+            <span className="block text-xs text-slate-400">
+              Metadata intelligence for modern video teams.
+            </span>
+          </span>
+        </Link>
         <nav className="hidden items-center gap-4 text-sm text-slate-600 md:flex">
           {NAVIGATION_LINKS.map((link) => (
             <Link

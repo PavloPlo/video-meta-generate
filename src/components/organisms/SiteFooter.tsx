@@ -5,7 +5,7 @@ export default function SiteFooter() {
     <footer className="flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-          Video Meta Generate
+          youhook
         </p>
         <div className="flex flex-wrap gap-4">
           <Link className="transition hover:text-slate-900" href="/privacy">
