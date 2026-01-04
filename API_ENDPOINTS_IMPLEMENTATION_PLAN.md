@@ -468,3 +468,4 @@ src/constants/
 - All endpoints should be authenticated (except health check)
 - Consider implementing request logging for debugging
 
+

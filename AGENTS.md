@@ -7,6 +7,13 @@
 - **Atomic component architecture**: Build all pages from reusable atomic components with flexible props.
 - **Structured organization**: Centralize components, constants, and utilities in dedicated folders.
 
+## Product documentation (PM/BA onboarding)
+- The file `docs/PRODUCT_OVERVIEW.md` is the **source of truth** for the product’s business-facing overview.
+- After adding, changing, or removing a user-facing capability, you must update `docs/PRODUCT_OVERVIEW.md` accordingly:
+  - Keep the **“What users can generate today”** section accurate.
+  - Keep the **“What is explicitly not part of the product (yet)”** section accurate.
+  - Avoid technical implementation details; write for **PMs and BAs**.
+
 ## Project structure
 ### Folder organization
 - `src/app/` - Next.js App Router pages and layouts (composition only, no UI components)
