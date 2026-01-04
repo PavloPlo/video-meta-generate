@@ -34,6 +34,12 @@ This command will:
 
 Open [http://localhost:3000](http://localhost:3000) to view the UI.
 
+To stop the development environment and clean up all containers and volumes:
+
+```bash
+npm run dev:shutdown
+```
+
 ### Manual Setup
 
 If you prefer to set up services individually:
@@ -49,6 +55,7 @@ Then follow the Docker setup instructions below.
 
 - `npm run dev` – Start the development server (requires manual Docker setup).
 - `npm run dev:setup` – **Recommended**: Start complete development environment with all services.
+- `npm run dev:shutdown` – Stop and clean up the development environment.
 - `npm run build` – Build the production bundle.
 - `npm run start` – Run the production server after building.
 - `npm run lint` – Run Next.js lint checks.

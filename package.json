@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:setup": "npx tsx scripts/dev-setup.ts",
+    "dev:shutdown": "npx tsx scripts/dev-setup.ts shutdown",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

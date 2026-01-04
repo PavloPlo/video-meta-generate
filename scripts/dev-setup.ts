@@ -4,13 +4,13 @@ import { spawn, execSync } from 'child_process';
 import { existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-const SCRIPT_DIR = __dirname;
-const PROJECT_ROOT = join(SCRIPT_DIR, '..');
-
 interface ServiceStatus {
   postgres: boolean;
   minio: boolean;
 }
+
+const SCRIPT_DIR = __dirname;
+const PROJECT_ROOT = join(SCRIPT_DIR, '..');
 
 class DevSetup {
   private envLocalPath = join(PROJECT_ROOT, '.env.local');
@@ -41,10 +41,8 @@ class DevSetup {
         stdio: 'pipe'
       });
 
-      const containers = JSON.parse(result);
-      return containers.some((container: any) =>
-        container.State === 'running' && container.Health === 'healthy'
-      );
+      const container = JSON.parse(result.trim());
+      return container.State === 'running' && container.Health === 'healthy';
     } catch {
       return false;
     }
@@ -178,26 +176,33 @@ NODE_ENV="development"
     });
   }
 
+  private async shutdownServices(): Promise<void> {
+    console.log('🛑 Shutting down development environment...');
+
+    try {
+      console.log('  Stopping Docker services...');
+      execSync('docker compose --profile local down', {
+        cwd: PROJECT_ROOT,
+        stdio: 'inherit'
+      });
+      console.log('✅ Docker services stopped');
+
+      console.log('  Cleaning up containers and volumes...');
+      execSync('docker compose --profile local down -v', {
+        cwd: PROJECT_ROOT,
+        stdio: 'inherit'
+      });
+      console.log('✅ Containers and volumes cleaned up');
+
+      console.log('🎉 Development environment shut down successfully!');
+    } catch (error) {
+      console.error('❌ Error during shutdown:', error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
+  }
+
   async run(): Promise<void> {
-    console.log('🔧 Setting up Video Meta Generate development environment...\n');
-
-    // Check prerequisites
-    console.log('🔍 Checking prerequisites...');
-
-    const dockerAvailable = await this.checkDocker();
-    if (!dockerAvailable) {
-      console.error('❌ Docker is not available. Please install Docker and try again.');
-      console.log('   Download: https://docs.docker.com/get-docker/');
-      process.exit(1);
-    }
-    console.log('✅ Docker is available');
-
-    const composeAvailable = await this.checkDockerCompose();
-    if (!composeAvailable) {
-      console.error('❌ Docker Compose is not available. Please install Docker Compose and try again.');
-      process.exit(1);
-    }
-    console.log('✅ Docker Compose is available');
+    console.log('🔧 Video Meta Generate development environment tool\n');
 
     try {
       // Start Docker services
@@ -218,11 +223,50 @@ NODE_ENV="development"
       process.exit(1);
     }
   }
+
+  async shutdown(): Promise<void> {
+    console.log('🔧 Video Meta Generate development environment tool\n');
+
+    // Check prerequisites (only Docker is needed for shutdown)
+    console.log('🔍 Checking prerequisites...');
+
+    const dockerAvailable = await this.checkDocker();
+    if (!dockerAvailable) {
+      console.error('❌ Docker is not available. Please install Docker and try again.');
+      console.log('   Download: https://docs.docker.com/get-docker/');
+      process.exit(1);
+    }
+    console.log('✅ Docker is available');
+
+    await this.shutdownServices();
+  }
 }
 
-// Run the setup
+// Parse command line arguments
+const args = process.argv.slice(2);
+const command = args[0] || 'setup';
+
 const setup = new DevSetup();
-setup.run().catch((error) => {
-  console.error('💥 Unexpected error:', error);
+
+if (command === 'shutdown' || command === 'down' || command === 'stop') {
+  setup.shutdown().catch((error) => {
+    console.error('💥 Unexpected error during shutdown:', error);
+    process.exit(1);
+  });
+} else if (command === 'setup' || command === 'up' || command === 'start') {
+  setup.run().catch((error) => {
+    console.error('💥 Unexpected error during setup:', error);
+    process.exit(1);
+  });
+} else {
+  console.log('Usage: npm run dev:setup [command]');
+  console.log('');
+  console.log('Commands:');
+  console.log('  setup, up, start  - Start the development environment (default)');
+  console.log('  shutdown, down, stop - Stop and clean up the development environment');
+  console.log('');
+  console.log('Examples:');
+  console.log('  npm run dev:setup          # Start development environment');
+  console.log('  npm run dev:setup shutdown # Stop development environment');
   process.exit(1);
-});
+}
