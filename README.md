@@ -16,16 +16,39 @@ supporting services together.
 
 ## Getting started
 
+### Quick Start (Recommended)
+
+For a complete development environment with all services:
+
+```bash
+npm install
+npm run dev:setup
+```
+
+This command will:
+- Start PostgreSQL and MinIO containers
+- Create `.env.local` with default development settings
+- Run database migrations
+- Seed the database with test data
+- Start the Next.js development server
+
+Open [http://localhost:3000](http://localhost:3000) to view the UI.
+
+### Manual Setup
+
+If you prefer to set up services individually:
+
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the UI.
+Then follow the Docker setup instructions below.
 
 ## Available scripts
 
-- `npm run dev` – Start the development server.
+- `npm run dev` – Start the development server (requires manual Docker setup).
+- `npm run dev:setup` – **Recommended**: Start complete development environment with all services.
 - `npm run build` – Build the production bundle.
 - `npm run start` – Run the production server after building.
 - `npm run lint` – Run Next.js lint checks.
